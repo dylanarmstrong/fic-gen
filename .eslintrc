@@ -1,0 +1,8 @@
+{
+  "extends": [
+    "@dylanarmstrong",
+    "prettier"
+  ],
+  "rules": {
+  }
+}

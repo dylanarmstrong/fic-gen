@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "module": "es2020",
+    "moduleResolution": "node",
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "outDir": "./lib",
+    "resolveJsonModule": true,
+    "strict": true,
+    "target": "es2020"
+  },
+  "exclude":[
+    "./node_modules"
+  ],
+  "include": ["./src/**/*"]
+}

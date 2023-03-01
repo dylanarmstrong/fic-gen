@@ -1,0 +1,6 @@
+[submodule "bin/boringssl"]
+	path = build/boringssl
+	url = https://github.com/google/boringssl
+[submodule "bin/curl"]
+	path = build/curl
+	url = https://github.com/curl/curl

@@ -1,0 +1,10 @@
+.DS_Store
+build/
+curl-impersonate/*
+epubs/*
+lib/
+node_modules
+filename.epub
+
+!curl-impersonate/.gitkeep
+!epubs/.gitkeep
