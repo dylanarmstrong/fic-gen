@@ -7,8 +7,7 @@
  * Path to curl should be moved to XDG_DATA_HOME
  *
  * Site Support:
- * Xenforo
- * Fanfiction
+ * Xenforo General
  * Fictionpress
  *
  */

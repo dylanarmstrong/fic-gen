@@ -2,7 +2,7 @@ import path from 'path';
 import { exec as execSync } from 'child_process';
 import { promisify } from 'util';
 
-import { error, log } from './utils/log.js';
+import { debug, error } from './utils/log.js';
 
 const { url: importUrl } = import.meta;
 const importUrls = importUrl.split(path.sep);
@@ -30,7 +30,7 @@ const curl = async (url: string, options: string): Promise<string> => {
     cookie ? ` -H 'Cookie: ${cookie}'` : ''
   } -s "${url}" ${options}`;
 
-  log(cmd, true);
+  debug(cmd);
 
   const { stderr, stdout } = await exec(cmd);
   if (stderr) {

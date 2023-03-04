@@ -4,7 +4,7 @@ import { isDebugMode } from './debugMode.js';
 const _log = (
   msg: string,
   mode: 'error' | 'log' | 'warn',
-  debugOnly: boolean,
+  debugOnly = false,
 ) => {
   if (!debugOnly || (debugOnly && isDebugMode())) {
     // eslint-disable-next-line no-console
@@ -12,8 +12,9 @@ const _log = (
   }
 };
 
-const error = (msg: string, debugOnly = false) => _log(msg, 'error', debugOnly);
-const log = (msg: string, debugOnly = false) => _log(msg, 'log', debugOnly);
+const debug = (msg: string) => _log(msg, 'log', true);
+const error = (msg: string) => _log(msg, 'error');
+const log = (msg: string) => _log(msg, 'log');
 // const warn = (msg: string, debugOnly = false) => _log(msg, 'warn', debugOnly);
 
-export { error, log };
+export { debug, error, log };
