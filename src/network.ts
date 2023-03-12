@@ -1,5 +1,5 @@
 import { constants } from 'fs';
-import { access, readFile, writeFile } from 'fs/promises';
+import { access, readFile } from 'fs/promises';
 import md5 from 'md5';
 import path from 'path';
 import { exec as execSync } from 'child_process';
@@ -28,47 +28,42 @@ const setCookie = (_cookie: string) => {
 
 const getCachePath = (url: URL) => path.join(cachePath, md5(url.href));
 
-const checkCache = async (url: URL) => {
-  const file = getCachePath(url);
+const getCache = async (file: string) => {
   try {
     await access(file, constants.R_OK);
     return String(await readFile(file));
   } catch {
     // Skip
   }
-  return false;
-};
-
-const writeCache = async (url: URL, data: string) => {
-  const file = getCachePath(url);
-  await writeFile(file, data);
+  return '';
 };
 
 // cookie is the cf_clearance cookie
 const curl = async (url: URL, options = ''): Promise<[string, string]> => {
   const cacheFile = getCachePath(url);
   if (cache) {
-    const cached = await checkCache(url);
-    if (cached !== false) {
-      debug(`Cache hit for ${url.href}`);
+    const cached = await getCache(cacheFile);
+    if (cached !== '') {
+      debug(`Cache hit for ${url.href} at ${cacheFile}`);
       return [cached, cacheFile];
     }
     debug(`Cache miss for ${url.href}`);
+  } else {
+    debug(`Skip cache for ${url.href}`);
   }
 
   const cmd = `${curlPath} -A '${agent}'${
     cookie ? ` -H 'Cookie: ${cookie}'` : ''
-  } -s "${url}" ${options} -o ${cacheFile}`;
+  } -s -o "${cacheFile}" ${options} -- "${url}"`;
 
   debug(cmd);
 
-  const { stderr, stdout } = await exec(cmd);
+  const { stderr } = await exec(cmd);
   if (stderr) {
     error(stderr);
-  } else {
-    await writeCache(url, stdout);
   }
-  return [stdout, cacheFile];
+
+  return [await getCache(cacheFile), cacheFile];
 };
 
 export { curl, setAgent, setCache, setCookie };
