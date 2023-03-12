@@ -1,15 +1,8 @@
-import path from 'path';
 import { exec as execSync } from 'child_process';
 import { promisify } from 'util';
 
+import { curl as curlPath } from './utils/paths.js';
 import { debug, error } from './utils/log.js';
-
-const { url: importUrl } = import.meta;
-const importUrls = importUrl.split(path.sep);
-// Remove file:// and src/network.js
-const base = `/${importUrls.slice(3, importUrls.length - 2).join(path.sep)}`;
-
-const curlPath = path.join(base, 'curl-impersonate', 'curl-impersonate-ff');
 
 const exec = promisify(execSync);
 
@@ -39,4 +32,4 @@ const curl = async (url: string, options: string): Promise<string> => {
   return stdout;
 };
 
-export { setAgent, setCookie, curlPath, curl };
+export { curl, setAgent, setCookie };

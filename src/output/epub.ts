@@ -92,6 +92,7 @@ const write = async (fic: Fic, outputPath: string) => {
     filepath = path.join(os.tmpdir(), `${uuid}-cover.png`);
     await curl(cover, `-o "${filepath}"`);
   }
+
   const metadata = {
     author: fic.author.text,
     cover: filepath,
@@ -100,6 +101,7 @@ const write = async (fic: Fic, outputPath: string) => {
     publisher: fic.publisher,
     title,
   };
+
   const epub = nodepub.document(metadata);
 
   epub.addCSS(`

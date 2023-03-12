@@ -3,8 +3,9 @@
  * TODO
  *
  * Retry for failing curl
- * Image should have cache so they can point to same download
- * Path to curl should be moved to XDG_DATA_HOME
+ * Cache all files
+ * Add --no-cache option
+ * Max title length? For kindle -- test with the editor story
  *
  * Site Support:
  * Xenforo General
@@ -20,9 +21,13 @@ import ArchiveOfOurOwn from './sites/archiveofourown.js';
 import FanFiction from './sites/fanfiction.js';
 import RoyalRoad from './sites/royalroad.js';
 import Xenforo from './sites/xenforo.js';
-import dataPath from './utils/dataPath.js';
+import {
+  cache as cachePath,
+  curl as curlPath,
+  data as dataPath,
+} from './utils/paths.js';
 import write from './output/epub.js';
-import { curlPath, setAgent, setCookie } from './network.js';
+import { setAgent, setCookie } from './network.js';
 import { setDebugMode } from './utils/debugMode.js';
 
 type Args = {
@@ -90,7 +95,17 @@ const { agent, cookie, debug, outputPath, url } = args;
       await mkdir(outputPath);
     }
   } catch {
-    throw new Error(`Cannot make output directory at ${outputPath}`);
+    throw new Error(`Cannot make data directory at ${outputPath}`);
+  }
+
+  try {
+    try {
+      await access(cachePath, constants.W_OK);
+    } catch {
+      await mkdir(cachePath);
+    }
+  } catch {
+    throw new Error(`Cannot make cache directory at ${outputPath}`);
   }
 
   const site = [

@@ -42,7 +42,7 @@ class ArchiveOfOurOwn extends Site {
     for (let i = 2, len = numberOfChapters + 1; i < len; i++) {
       const nextChapter = $chapter('.chapter.next a').attr('href');
       if (typeof nextChapter !== 'undefined') {
-        const next = new URL(this.url);
+        const next = this.url;
         next.pathname = nextChapter;
         chapter = await this.getChapter(next.href);
         if (chapter !== null) {

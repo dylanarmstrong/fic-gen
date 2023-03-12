@@ -68,7 +68,7 @@ class RoyalRoad extends Site {
 
     for (let i = 0, len = chapters.length; i < len; i++) {
       const nextChapter = chapters[i].url;
-      const next = new URL(this.url);
+      const next = this.url;
       next.pathname = nextChapter;
       chapter = await this.getChapter(next.href);
       if (chapter !== null) {

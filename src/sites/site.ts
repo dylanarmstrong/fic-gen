@@ -189,7 +189,7 @@ abstract class Site implements ISite {
   async transformImages($content: Cheerio<AnyNode>) {
     const ps: Promise<string | null>[] = [];
     $content.find('img').each((_, img) => {
-      ps.push(loadImage(this.cookie, img));
+      ps.push(loadImage(img));
     });
     await Promise.all(ps).then((imgs) =>
       imgs.forEach((img) => img !== null && this.images.push(img)),

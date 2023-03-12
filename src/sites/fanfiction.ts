@@ -48,7 +48,7 @@ class FanFiction extends Site {
         const spl = this.url.href.split('/');
         spl[spl.length - 2] = String(i);
         const nextChapter = spl.join('/');
-        const next = new URL(this.url);
+        const next = this.url;
         next.href = nextChapter;
         chapter = await this.getChapter(next.href);
         if (chapter !== null) {

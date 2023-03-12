@@ -5,10 +5,7 @@ import type { Element } from 'cheerio';
 
 import { curl } from '../network.js';
 
-const loadImage = async (
-  cookie: string,
-  img: Element,
-): Promise<string | null> => {
+const loadImage = async (img: Element): Promise<string | null> => {
   const { src } = img.attribs;
   if (!src) {
     return null;
