@@ -27,7 +27,7 @@ class Xenforo extends Site {
   }
 
   async getFic() {
-    let chapter = await this.getChapter(this.url.href, false);
+    let chapter = await this.getChapter(this.url, false);
     if (chapter === null) {
       error(`Chapter: ${this.url.href} is null`);
       return null;
@@ -62,7 +62,7 @@ class Xenforo extends Site {
 
     for (let i = 0, len = chapters.length; i < len; i++) {
       const next = new URL(chapters[i].url);
-      chapter = await this.getChapter(next.href.replace('%23', '#'));
+      chapter = await this.getChapter(new URL(next.href.replace('%23', '#')));
       if (chapter !== null) {
         $chapter = loadHtml(chapter);
         const parsedChapter = await this.parseChapter($chapter, i + 1, next);

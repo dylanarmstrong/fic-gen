@@ -4,8 +4,8 @@
  *
  * Retry for failing curl
  * Cache all files
- * Add --no-cache option
  * Max title length? For kindle -- test with the editor story
+ * Add skip cache for use on initial page, so chapter list isn't cached
  *
  * Site Support:
  * Xenforo General
@@ -27,11 +27,12 @@ import {
   data as dataPath,
 } from './utils/paths.js';
 import write from './output/epub.js';
-import { setAgent, setCookie } from './network.js';
+import { setAgent, setCache, setCookie } from './network.js';
 import { setDebugMode } from './utils/debugMode.js';
 
 type Args = {
   agent: string;
+  cache: boolean;
   cookie: string;
   debug: boolean;
   outputPath: string;
@@ -65,6 +66,13 @@ parser.add_argument('-d', '--debug', {
   default: false,
   help: 'enable debug output',
 });
+parser.add_argument('--no-cache', {
+  action: 'store_const',
+  const: false,
+  default: true,
+  dest: 'cache',
+  help: 'disable cache output',
+});
 parser.add_argument('-o', '--output', {
   default: dataPath,
   dest: 'outputPath',
@@ -75,10 +83,11 @@ parser.add_argument('-v', '--version', { action: 'version', version: '0.0.1' });
 parser.add_argument('url', { help: 'the url to retrieve', type: String });
 const args: Args = parser.parse_args();
 
-const { agent, cookie, debug, outputPath, url } = args;
+const { agent, cache, cookie, debug, outputPath, url } = args;
 
 (async () => {
   setAgent(agent);
+  setCache(cache);
   setCookie(cookie);
   setDebugMode(debug);
 

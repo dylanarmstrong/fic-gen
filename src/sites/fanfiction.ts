@@ -23,7 +23,7 @@ class FanFiction extends Site {
   }
 
   async getFic() {
-    let chapter = await this.getChapter(this.url.href, false);
+    let chapter = await this.getChapter(this.url, false);
     if (chapter === null) {
       error(`Chapter: ${this.url.href} is null`);
       return null;
@@ -50,7 +50,7 @@ class FanFiction extends Site {
         const nextChapter = spl.join('/');
         const next = this.url;
         next.href = nextChapter;
-        chapter = await this.getChapter(next.href);
+        chapter = await this.getChapter(next);
         if (chapter !== null) {
           $chapter = loadHtml(chapter);
           const parsedChapter = await this.parseChapter($chapter, i, next);
@@ -94,8 +94,7 @@ class FanFiction extends Site {
     }
 
     try {
-      const url = new URL(`https://www.fanfiction.net${src}`);
-      return url.href;
+      return new URL(`https://www.fanfiction.net${src}`);
     } catch (e) {
       return null;
     }

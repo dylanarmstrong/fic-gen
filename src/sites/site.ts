@@ -20,7 +20,7 @@ type Chapter = {
 type Fic = {
   author: Author;
   chapters: Chapter[];
-  cover: string | null;
+  cover: URL | null;
   description: string;
   id: string;
   images: string[];
@@ -50,10 +50,10 @@ interface ISite {
   };
 
   getAuthor($chapter: CheerioAPI): Author;
-  getChapter(url: string): Promise<string | null>;
+  getChapter(url: URL): Promise<string | null>;
   getChapterTitle($chapter: CheerioAPI): string;
   getChapterWords(content: string | null): number;
-  getCover($chapter: CheerioAPI): Promise<string | null>;
+  getCover($chapter: CheerioAPI): Promise<URL | null>;
   getDescription($chapter: CheerioAPI): string;
   getFic(): Promise<Fic | null>;
   getNumberOfChapters($chapter: CheerioAPI): number;
@@ -103,8 +103,8 @@ abstract class Site implements ISite {
     };
   }
 
-  async getChapter(url: string, checkValidity = true) {
-    const chapter = await curl(url, this.options);
+  async getChapter(url: URL, checkValidity = true) {
+    const [chapter] = await curl(url, this.options);
     if (!checkValidity || (checkValidity && this.isValidChapter(chapter))) {
       return chapter;
     }
@@ -126,8 +126,7 @@ abstract class Site implements ISite {
     }
 
     try {
-      const url = new URL(src);
-      return url.href;
+      return new URL(src);
     } catch (e) {
       return null;
     }

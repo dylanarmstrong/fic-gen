@@ -23,7 +23,7 @@ class ArchiveOfOurOwn extends Site {
   }
 
   async getFic() {
-    let chapter = await this.getChapter(this.url.href);
+    let chapter = await this.getChapter(this.url);
     if (chapter === null) {
       error(`Chapter: ${this.url.href} is null`);
       return null;
@@ -44,7 +44,7 @@ class ArchiveOfOurOwn extends Site {
       if (typeof nextChapter !== 'undefined') {
         const next = this.url;
         next.pathname = nextChapter;
-        chapter = await this.getChapter(next.href);
+        chapter = await this.getChapter(next);
         if (chapter !== null) {
           $chapter = loadHtml(chapter);
           chapters.push(await this.parseChapter($chapter, i, next));

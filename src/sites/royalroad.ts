@@ -27,7 +27,7 @@ class RoyalRoad extends Site {
   }
 
   async getFic() {
-    let chapter = await this.getChapter(this.url.href, false);
+    let chapter = await this.getChapter(this.url, false);
     if (chapter === null) {
       error(`Chapter: ${this.url.href} is null`);
       return null;
@@ -70,7 +70,7 @@ class RoyalRoad extends Site {
       const nextChapter = chapters[i].url;
       const next = this.url;
       next.pathname = nextChapter;
-      chapter = await this.getChapter(next.href);
+      chapter = await this.getChapter(next);
       if (chapter !== null) {
         $chapter = loadHtml(chapter);
         const parsedChapter = await this.parseChapter($chapter, i + 1, next);

@@ -1,5 +1,3 @@
-import os from 'os';
-import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import type { Element } from 'cheerio';
 
@@ -16,11 +14,10 @@ const loadImage = async (img: Element): Promise<string | null> => {
     const end = srcSplit.length > 0 ? srcSplit[srcSplit.length - 1] : null;
     if (end) {
       const filename = `${uuidv4()}-${end}`;
-      const full = path.join(os.tmpdir(), filename);
       img.attribs.src = `../images/${filename}`;
       img.attribs.alt = img.attribs.alt || 'image';
-      await curl(url.href, `-o "${full}"`);
-      return full;
+      const [,filepath] = await curl(url);
+      return filepath;
     }
   } catch (e) {
     // Pass

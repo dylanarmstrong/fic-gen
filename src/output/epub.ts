@@ -1,8 +1,6 @@
 import nodepub from 'nodepub';
-import os from 'os';
 import path from 'path';
 import sanitizeHtml from 'sanitize-html';
-import { v4 as uuidv4 } from 'uuid';
 
 import normalizeHtml from '../utils/normalizeHtml.js';
 import type { Fic } from '../sites/site.js';
@@ -88,9 +86,7 @@ const write = async (fic: Fic, outputPath: string) => {
   const { cover, title } = fic;
   let filepath = '/Users/dylan/Desktop/z.png';
   if (cover) {
-    const uuid = uuidv4();
-    filepath = path.join(os.tmpdir(), `${uuid}-cover.png`);
-    await curl(cover, `-o "${filepath}"`);
+    [,filepath] = await curl(cover);
   }
 
   const metadata = {
