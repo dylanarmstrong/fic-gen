@@ -105,7 +105,7 @@ const { agent, cookie, debug, outputPath, url } = args;
       await mkdir(cachePath);
     }
   } catch {
-    throw new Error(`Cannot make cache directory at ${outputPath}`);
+    throw new Error(`Cannot make cache directory at ${cachePath}`);
   }
 
   const site = [
