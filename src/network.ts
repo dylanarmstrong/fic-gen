@@ -1,7 +1,8 @@
-import { constants } from 'fs';
-import { access, readFile } from 'fs/promises';
+import defaults from 'defaults';
 import md5 from 'md5';
 import path from 'path';
+import { access, readFile } from 'fs/promises';
+import { constants } from 'fs';
 import { exec as execSync } from 'child_process';
 import { promisify } from 'util';
 
@@ -38,10 +39,21 @@ const getCache = async (file: string) => {
   return '';
 };
 
+type CurlOptions = Partial<{
+  append: string;
+  cache: boolean;
+}>;
+
+const defaultCurlOptions = {
+  append: '',
+  cache: true,
+};
+
 // cookie is the cf_clearance cookie
-const curl = async (url: URL, options = ''): Promise<[string, string]> => {
+const curl = async (url: URL, _options?: CurlOptions): Promise<[string, string]> => {
+  const options = defaults(_options, defaultCurlOptions);
   const cacheFile = getCachePath(url);
-  if (cache) {
+  if (options.cache && cache) {
     const cached = await getCache(cacheFile);
     if (cached !== '') {
       debug(`Cache hit for ${url.href} at ${cacheFile}`);
@@ -54,7 +66,7 @@ const curl = async (url: URL, options = ''): Promise<[string, string]> => {
 
   const cmd = `${curlPath} -A '${agent}'${
     cookie ? ` -H 'Cookie: ${cookie}'` : ''
-  } -s -o "${cacheFile}" ${options} -- "${url}"`;
+  } -s -o "${cacheFile}" ${options.append} -- "${url}"`;
 
   debug(cmd);
 
