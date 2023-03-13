@@ -3,7 +3,6 @@
  * TODO
  *
  * Retry for failing curl
- * Cache all files
  * Max title length? For kindle -- test with the editor story
  * Add skip cache for use on initial page, so chapter list isn't cached
  *
