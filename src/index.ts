@@ -73,7 +73,7 @@ parser.add_argument('--no-cache', {
   const: false,
   default: true,
   dest: 'cache',
-  help: 'disable cache output',
+  help: 'disable cache',
 });
 parser.add_argument('-o', '--output', {
   default: dataPath,
