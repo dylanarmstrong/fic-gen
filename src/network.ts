@@ -1,10 +1,10 @@
 import defaults from 'defaults';
 import md5 from 'md5';
-import path from 'path';
-import { access, readFile } from 'fs/promises';
-import { constants } from 'fs';
-import { exec as execSync } from 'child_process';
-import { promisify } from 'util';
+import path from 'node:path';
+import { access, readFile } from 'node:fs/promises';
+import { constants } from 'node:fs';
+import { exec as execSync } from 'node:child_process';
+import { promisify } from 'node:util';
 
 import { cache as cachePath, curl as curlPath } from './utils/paths.js';
 import { debug, error } from './utils/log.js';

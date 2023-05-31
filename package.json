@@ -6,8 +6,8 @@
   "bugs": {
     "url": "https://github.com/dylanarmstrong/fic-gen/issues"
   },
-  "main": "./lib/index.js",
   "license": "ISC",
+  "exports": "./lib/index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/dylanarmstrong/fic-gen"
@@ -38,11 +38,11 @@
     "trailingComma": "all"
   },
   "devDependencies": {
-    "@dylanarmstrong/eslint-config": "^0.3.0",
+    "@dylanarmstrong/eslint-config": "^0.4.0",
     "@types/argparse": "^2.0.10",
     "@types/defaults": "^1.0.3",
     "@types/md5": "^2.3.2",
-    "@types/node": "^16.18.34",
+    "@types/node": "^20.2.5",
     "@types/nodepub": "^3.0.0",
     "@types/sanitize-html": "^2.9.0",
     "@types/uuid": "^9.0.1",
@@ -50,7 +50,7 @@
     "@typescript-eslint/parser": "^5.59.8",
     "eslint": "^8.41.0",
     "eslint-config-prettier": "^8.8.0",
-    "eslint-import-resolver-typescript": "^2.7.1",
+    "eslint-import-resolver-typescript": "^3.5.5",
     "eslint-plugin-import": "^2.27.5",
     "prettier": "^2.8.8",
     "typescript": "^5.0.4"
@@ -58,8 +58,8 @@
   "dependencies": {
     "argparse": "^2.0.1",
     "cheerio": "1.0.0-rc.12",
-    "defaults": "^1.0.4",
-    "htmlparser2": "^8.0.2",
+    "defaults": "^2.0.1",
+    "htmlparser2": "^9.0.0",
     "md5": "^2.3.0",
     "nodepub": "^3.0.8",
     "parse5": "^7.1.2",

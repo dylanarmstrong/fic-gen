@@ -16,8 +16,8 @@
  */
 
 import { ArgumentParser, RawTextHelpFormatter } from 'argparse';
-import { access, mkdir } from 'fs/promises';
-import { constants } from 'fs';
+import { access, mkdir } from 'node:fs/promises';
+import { constants } from 'node:fs';
 
 import ArchiveOfOurOwn from './sites/archiveofourown.js';
 import BoxNovel from './sites/boxnovel.js';

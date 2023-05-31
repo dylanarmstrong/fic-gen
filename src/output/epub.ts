@@ -1,5 +1,5 @@
 import nodepub from 'nodepub';
-import path from 'path';
+import path from 'node:path';
 import sanitizeHtml from 'sanitize-html';
 
 import normalizeHtml from '../utils/normalizeHtml.js';
