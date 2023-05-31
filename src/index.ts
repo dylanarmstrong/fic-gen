@@ -20,6 +20,7 @@ import { access, mkdir } from 'fs/promises';
 import { constants } from 'fs';
 
 import ArchiveOfOurOwn from './sites/archiveofourown.js';
+import BoxNovel from './sites/boxnovel.js';
 import FanFiction from './sites/fanfiction.js';
 import RoyalRoad from './sites/royalroad.js';
 import Xenforo from './sites/xenforo.js';
@@ -45,6 +46,7 @@ const parser = new ArgumentParser({
   description: `ePub output for online fiction
 Supports:
   * ArchiveOfOurOwn
+  * BoxNovel
   * FanFiction
   * RoyalRoad
   * SpaceBattles`,
@@ -121,6 +123,7 @@ const { agent, cache, cookie, debug, outputPath, url } = args;
 
   const site = [
     new ArchiveOfOurOwn(url, cookie),
+    new BoxNovel(url, cookie),
     new FanFiction(url, cookie),
     new RoyalRoad(url, cookie),
     new Xenforo(url, cookie),

@@ -106,7 +106,10 @@ abstract class Site implements ISite {
   // TODO: pass in actual options
   async getChapter(url: URL, checkValidity = true) {
     // TODO: change this cache check
-    const [chapter] = await curl(url, { append: this.options, cache: checkValidity });
+    const [chapter] = await curl(url, {
+      append: this.options,
+      cache: checkValidity,
+    });
     if (!checkValidity || (checkValidity && this.isValidChapter(chapter))) {
       return chapter;
     }

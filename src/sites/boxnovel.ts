@@ -2,24 +2,25 @@ import type { CheerioAPI } from 'cheerio';
 
 import loadHtml from '../utils/loadHtml.js';
 import { Chapter, Site } from './site.js';
+import { curl } from '../network.js';
 import { error } from '../utils/log.js';
 
 const hasData = (o: unknown): o is { data: string } =>
   Object.hasOwnProperty.call(o, 'data') &&
   typeof (o as { data: unknown }).data === 'string';
 
-class RoyalRoad extends Site {
-  matcher = /^www.royalroad.com/;
+class BoxNovel extends Site {
+  matcher = /^boxnovel.com/;
   options = '';
-  publisher = 'RoyalRoad';
+  publisher = 'BoxNovel';
 
   selectors = {
-    author: '.fic-title a',
-    chapter: '.chapter-inner.chapter-content',
-    chapterTitle: 'h1.font-white',
-    cover: 'img.thumbnail.inline-block',
-    description: '.summary.module blockquote',
-    storyTitle: 'h1.font-white',
+    author: '.author-content > a',
+    chapter: '.reading-content',
+    chapterTitle: '.reading-content p:first-child > strong',
+    cover: '.summary_image img',
+    description: '#editdescription',
+    storyTitle: '.post-title',
   };
 
   constructor(url: string, cookie?: string) {
@@ -34,26 +35,28 @@ class RoyalRoad extends Site {
     }
 
     let $chapter = loadHtml(chapter);
-    let chapters: Chapter[] = [];
-    $chapter('script').each((_, element) => {
-      if (chapters.length === 0 && element.children.length === 1) {
-        const [first] = element.children;
-        if (first && hasData(first)) {
-          const data = first.data
-            .split('\n')
-            .map((s) => s.trim())
-            .filter(Boolean);
-          const chapterIdx = data.findIndex((s) =>
-            s.startsWith('window.chapters = [{'),
-          );
-          if (chapterIdx > -1) {
-            chapters = JSON.parse(
-              data[chapterIdx].replace(/window\.chapters =(.*);/, '$1'),
-            );
-          }
-        }
-      }
+    const chapterUrl = new URL(`${this.url.href}ajax/chapters/`);
+    const [chaptersXhr] = await curl(chapterUrl, {
+      append: `-H "Referer: ${this.url.href}" -H "X-Requested-With: XMLHttpRequest" -X POST`,
+      cache: false,
     });
+    if (chaptersXhr === null) {
+      error(`Cannot get chapters list from ${chapterUrl.href}`);
+      return null;
+    }
+    const $chapters = loadHtml(chaptersXhr);
+    const chapters: Chapter[] = Array.from($chapters('ul.main li a'))
+      .map((a, index) => {
+        const [child] = a.children;
+        return {
+          chapter: index + 1,
+          text: null,
+          title: hasData(child) ? child.data : '',
+          url: a.attribs.href,
+          words: 0,
+        };
+      })
+      .reverse();
 
     if (chapters.length === 0) {
       return null;
@@ -66,10 +69,8 @@ class RoyalRoad extends Site {
     const words = this.getWords($chapter);
     const cover = await this.getCover($chapter);
 
-    for (let i = 0, len = chapters.length; i < len; i++) {
-      const nextChapter = chapters[i].url;
-      const next = this.url;
-      next.pathname = nextChapter;
+    for (let i = 0, len = chapters.length; i < len; i += 1) {
+      const next = new URL(chapters[i].url);
       chapter = await this.getChapter(next);
       if (chapter === null) {
         error(`Chapter: ${next.href} is null`);
@@ -97,13 +98,18 @@ class RoyalRoad extends Site {
   }
 
   // @override
-  getAuthor($chapter: CheerioAPI) {
-    const link = $chapter(this.selectors.author);
-    return {
-      text: link.text().trim(),
-      url: `https://www.royalroad.com${link.attr('href')?.trim() || ''}`,
-    };
+  async getCover($chapter: CheerioAPI) {
+    const src = $chapter(this.selectors.cover).attr('data-src');
+    if (!src) {
+      return null;
+    }
+
+    try {
+      return new URL(src);
+    } catch (e) {
+      return null;
+    }
   }
 }
 
-export default RoyalRoad;
+export default BoxNovel;

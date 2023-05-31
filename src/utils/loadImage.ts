@@ -16,7 +16,7 @@ const loadImage = async (img: Element): Promise<string | null> => {
       const filename = `${uuidv4()}-${end}`;
       img.attribs.src = `../images/${filename}`;
       img.attribs.alt = img.attribs.alt || 'image';
-      const [,filepath] = await curl(url);
+      const [, filepath] = await curl(url);
       return filepath;
     }
   } catch (e) {

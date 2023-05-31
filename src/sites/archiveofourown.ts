@@ -45,11 +45,11 @@ class ArchiveOfOurOwn extends Site {
         const next = this.url;
         next.pathname = nextChapter;
         chapter = await this.getChapter(next);
-        if (chapter !== null) {
+        if (chapter === null) {
+          error(`Chapter: ${next.href} is null`);
+        } else {
           $chapter = loadHtml(chapter);
           chapters.push(await this.parseChapter($chapter, i, next));
-        } else {
-          error(`Chapter: ${next.href} is null`);
         }
       }
     }

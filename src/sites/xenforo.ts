@@ -63,12 +63,12 @@ class Xenforo extends Site {
     for (let i = 0, len = chapters.length; i < len; i++) {
       const next = new URL(chapters[i].url);
       chapter = await this.getChapter(new URL(next.href.replace('%23', '#')));
-      if (chapter !== null) {
+      if (chapter === null) {
+        error(`Chapter: ${next.href} is null`);
+      } else {
         $chapter = loadHtml(chapter);
         const parsedChapter = await this.parseChapter($chapter, i + 1, next);
         chapters.splice(i, 1, parsedChapter);
-      } else {
-        error(`Chapter: ${next.href} is null`);
       }
     }
 

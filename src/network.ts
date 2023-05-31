@@ -50,7 +50,10 @@ const defaultCurlOptions = {
 };
 
 // cookie is the cf_clearance cookie
-const curl = async (url: URL, _options?: CurlOptions): Promise<[string, string]> => {
+const curl = async (
+  url: URL,
+  _options?: CurlOptions,
+): Promise<[string, string]> => {
   const options = defaults(_options, defaultCurlOptions);
   const cacheFile = getCachePath(url);
   if (options.cache && cache) {

@@ -86,7 +86,7 @@ const write = async (fic: Fic, outputPath: string) => {
   const { cover, title } = fic;
   let filepath = '/Users/dylan/Desktop/z.png';
   if (cover) {
-    [,filepath] = await curl(cover);
+    [, filepath] = await curl(cover);
   }
 
   const metadata = {
