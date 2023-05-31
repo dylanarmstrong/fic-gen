@@ -24,6 +24,7 @@ the path will be outputted as an error message.
 ## Working Sites
 
 * ArchiveOfOurOwn
+* BoxNovel
 * FanFiction
 * RoyalRoad
 * SpaceBattles
