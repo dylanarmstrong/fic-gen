@@ -1,15 +1,14 @@
 import type { CheerioAPI } from 'cheerio';
 
-import loadHtml from '../utils/loadHtml.js';
-import { Site } from './site.js';
-import { error } from '../utils/log.js';
+import loadHtml from '../utils/loadHtml';
+import { Site } from './site';
+import { error } from '../utils/log';
 
 class FanFiction extends Site {
-  matcher = /^www.fanfiction.net/;
-  options = '';
-  publisher = 'FanFiction';
-
-  selectors = {
+  override matcher = /^www.fanfiction.net/;
+  override options = '';
+  override publisher = 'FanFiction';
+  override selectors = {
     author: '#profile_top a:not([title]):not([target])',
     chapter: '#storytext',
     chapterTitle: 'h1.font-white',
@@ -77,8 +76,7 @@ class FanFiction extends Site {
     };
   }
 
-  // @override
-  getAuthor($chapter: CheerioAPI) {
+  override getAuthor($chapter: CheerioAPI) {
     const link = $chapter(this.selectors.author);
     return {
       text: link.text().trim(),
@@ -86,8 +84,7 @@ class FanFiction extends Site {
     };
   }
 
-  // @override
-  async getCover($chapter: CheerioAPI) {
+  override async getCover($chapter: CheerioAPI) {
     const src = $chapter(this.selectors.cover).attr('src');
     if (!src) {
       return null;

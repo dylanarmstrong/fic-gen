@@ -1,15 +1,14 @@
 import type { AnyNode, Cheerio, CheerioAPI } from 'cheerio';
 
-import loadHtml from '../utils/loadHtml.js';
-import { Site } from './site.js';
-import { error } from '../utils/log.js';
+import loadHtml from '../utils/loadHtml';
+import { Site } from './site';
+import { error } from '../utils/log';
 
 class ArchiveOfOurOwn extends Site {
-  matcher = /^archiveofourown.org/;
-  options = '-b "view_adult=true"';
-  publisher = 'Archive of Our Own';
-
-  selectors = {
+  override matcher = /^archiveofourown.org/;
+  override options = '-b "view_adult=true"';
+  override publisher = 'Archive of Our Own';
+  override selectors = {
     author: 'h3.byline.heading a',
     chapter: '[role="article"]',
     chapterTitle: 'h3.title',
@@ -70,18 +69,15 @@ class ArchiveOfOurOwn extends Site {
     };
   }
 
-  // @override
-  async getCover(_: CheerioAPI) {
+  override async getCover(_: CheerioAPI) {
     return null;
   }
 
-  // @override
-  getNumberOfChapters($chapter: CheerioAPI) {
+  override getNumberOfChapters($chapter: CheerioAPI) {
     return Number.parseInt($chapter('dd.chapters').text().split('/')[0]);
   }
 
-  // @override
-  transformChapter($content: Cheerio<AnyNode>) {
+  override transformChapter($content: Cheerio<AnyNode>) {
     $content.find('h3.landmark').remove();
     return $content;
   }

@@ -1,4 +1,4 @@
-import { isDebugMode } from './debugMode.js';
+import { isDebugMode } from './debugMode';
 
 // Log wrapper to handle debug only messages
 const _log = (

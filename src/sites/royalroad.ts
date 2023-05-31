@@ -1,19 +1,18 @@
 import type { CheerioAPI } from 'cheerio';
 
-import loadHtml from '../utils/loadHtml.js';
-import { Chapter, Site } from './site.js';
-import { error } from '../utils/log.js';
+import loadHtml from '../utils/loadHtml';
+import { Chapter, Site } from './site';
+import { error } from '../utils/log';
 
 const hasData = (o: unknown): o is { data: string } =>
   Object.hasOwnProperty.call(o, 'data') &&
   typeof (o as { data: unknown }).data === 'string';
 
 class RoyalRoad extends Site {
-  matcher = /^www.royalroad.com/;
-  options = '';
-  publisher = 'RoyalRoad';
-
-  selectors = {
+  override matcher = /^www.royalroad.com/;
+  override options = '';
+  override publisher = 'RoyalRoad';
+  override selectors = {
     author: '.fic-title a',
     chapter: '.chapter-inner.chapter-content',
     chapterTitle: 'h1.font-white',
@@ -96,8 +95,7 @@ class RoyalRoad extends Site {
     };
   }
 
-  // @override
-  getAuthor($chapter: CheerioAPI) {
+  override getAuthor($chapter: CheerioAPI) {
     const link = $chapter(this.selectors.author);
     return {
       text: link.text().trim(),

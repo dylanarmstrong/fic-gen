@@ -1,19 +1,18 @@
 import type { CheerioAPI } from 'cheerio';
 
-import loadHtml from '../utils/loadHtml.js';
-import { Chapter, Site } from './site.js';
-import { error } from '../utils/log.js';
+import loadHtml from '../utils/loadHtml';
+import { Chapter, Site } from './site';
+import { error } from '../utils/log';
 
 const hasData = (o: unknown): o is { data: string } =>
   Object.hasOwnProperty.call(o, 'data') &&
   typeof (o as { data: unknown }).data === 'string';
 
 class Xenforo extends Site {
-  matcher = /^(forums.spacebattles.com)/;
-  options = '';
-  publisher = 'Xenforo';
-
-  selectors = {
+  override matcher = /^(forums.spacebattles.com)/;
+  override options = '';
+  override publisher = 'Xenforo';
+  override selectors = {
     author: '.js-threadmarkTabPanes .username',
     chapter: 'article.hasThreadmark',
     chapterTitle: '.no-element',
@@ -88,8 +87,7 @@ class Xenforo extends Site {
     };
   }
 
-  // @override
-  getAuthor($chapter: CheerioAPI) {
+  override getAuthor($chapter: CheerioAPI) {
     const link = $chapter(this.selectors.author);
     return {
       text: link.text().trim(),
@@ -97,14 +95,12 @@ class Xenforo extends Site {
     };
   }
 
-  // @override
-  getStoryTitle($chapter: CheerioAPI) {
+  override getStoryTitle($chapter: CheerioAPI) {
     const title = $chapter(this.selectors.storyTitle).text().trim();
     return title.slice(0, title.length - ' - Threadmarks'.length);
   }
 
-  // @override
-  async parseChapter(
+  override async parseChapter(
     $chapter: CheerioAPI,
     chapterNumber: number,
     url: URL,

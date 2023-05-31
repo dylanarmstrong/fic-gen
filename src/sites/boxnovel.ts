@@ -1,20 +1,19 @@
 import type { CheerioAPI } from 'cheerio';
 
-import loadHtml from '../utils/loadHtml.js';
-import { Chapter, Site } from './site.js';
-import { curl } from '../network.js';
-import { error } from '../utils/log.js';
+import loadHtml from '../utils/loadHtml';
+import { Chapter, Site } from './site';
+import { curl } from '../network';
+import { error } from '../utils/log';
 
 const hasData = (o: unknown): o is { data: string } =>
   Object.hasOwnProperty.call(o, 'data') &&
   typeof (o as { data: unknown }).data === 'string';
 
 class BoxNovel extends Site {
-  matcher = /^boxnovel.com/;
-  options = '';
-  publisher = 'BoxNovel';
-
-  selectors = {
+  override matcher = /^boxnovel.com/;
+  override options = '';
+  override publisher = 'BoxNovel';
+  override selectors = {
     author: '.author-content > a',
     chapter: '.reading-content',
     chapterTitle: '.reading-content p:first-child > strong',
@@ -52,7 +51,7 @@ class BoxNovel extends Site {
           chapter: index + 1,
           text: null,
           title: hasData(child) ? child.data : '',
-          url: a.attribs.href,
+          url: a.attribs['href'],
           words: 0,
         };
       })
@@ -97,8 +96,7 @@ class BoxNovel extends Site {
     };
   }
 
-  // @override
-  async getCover($chapter: CheerioAPI) {
+  override async getCover($chapter: CheerioAPI) {
     const src = $chapter(this.selectors.cover).attr('data-src');
     if (!src) {
       return null;

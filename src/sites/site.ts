@@ -1,8 +1,8 @@
 import type { AnyNode, Cheerio, CheerioAPI } from 'cheerio';
 
-import loadHtml from '../utils/loadHtml.js';
-import loadImage from '../utils/loadImage.js';
-import { curl } from '../network.js';
+import loadHtml from '../utils/loadHtml';
+import loadImage from '../utils/loadImage';
+import { curl } from '../network';
 
 type Author = {
   text: string;

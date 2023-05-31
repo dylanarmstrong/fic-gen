@@ -19,19 +19,19 @@ import { ArgumentParser, RawTextHelpFormatter } from 'argparse';
 import { access, mkdir } from 'fs/promises';
 import { constants } from 'fs';
 
-import ArchiveOfOurOwn from './sites/archiveofourown.js';
-import BoxNovel from './sites/boxnovel.js';
-import FanFiction from './sites/fanfiction.js';
-import RoyalRoad from './sites/royalroad.js';
-import Xenforo from './sites/xenforo.js';
+import ArchiveOfOurOwn from './sites/archiveofourown';
+import BoxNovel from './sites/boxnovel';
+import FanFiction from './sites/fanfiction';
+import RoyalRoad from './sites/royalroad';
+import Xenforo from './sites/xenforo';
 import {
   cache as cachePath,
   curl as curlPath,
   data as dataPath,
-} from './utils/paths.js';
-import write from './output/epub.js';
-import { setAgent, setCache, setCookie } from './network.js';
-import { setDebugMode } from './utils/debugMode.js';
+} from './utils/paths';
+import write from './output/epub';
+import { setAgent, setCache, setCookie } from './network';
+import { setDebugMode } from './utils/debugMode';
 
 type Args = {
   agent: string;
