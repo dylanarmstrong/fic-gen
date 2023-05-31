@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import type { Element } from 'cheerio';
 
-import { curl } from '../network';
+import { curl } from '../network.js';
 
 const loadImage = async (img: Element): Promise<string | null> => {
   const { src } = img.attribs;

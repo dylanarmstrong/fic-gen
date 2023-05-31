@@ -1,8 +1,8 @@
 import type { AnyNode, Cheerio, CheerioAPI } from 'cheerio';
 
-import loadHtml from '../utils/loadHtml';
-import { Site } from './site';
-import { error } from '../utils/log';
+import loadHtml from '../utils/loadHtml.js';
+import { Site } from './site.js';
+import { error } from '../utils/log.js';
 
 class ArchiveOfOurOwn extends Site {
   override matcher = /^archiveofourown.org/;

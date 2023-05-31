@@ -1,9 +1,9 @@
 import type { CheerioAPI } from 'cheerio';
 
-import loadHtml from '../utils/loadHtml';
-import { Chapter, Site } from './site';
-import { curl } from '../network';
-import { error } from '../utils/log';
+import loadHtml from '../utils/loadHtml.js';
+import { Chapter, Site } from './site.js';
+import { curl } from '../network.js';
+import { error } from '../utils/log.js';
 
 const hasData = (o: unknown): o is { data: string } =>
   Object.hasOwnProperty.call(o, 'data') &&

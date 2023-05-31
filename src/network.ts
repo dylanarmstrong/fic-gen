@@ -6,8 +6,8 @@ import { constants } from 'fs';
 import { exec as execSync } from 'child_process';
 import { promisify } from 'util';
 
-import { cache as cachePath, curl as curlPath } from './utils/paths';
-import { debug, error } from './utils/log';
+import { cache as cachePath, curl as curlPath } from './utils/paths.js';
+import { debug, error } from './utils/log.js';
 
 const exec = promisify(execSync);
 

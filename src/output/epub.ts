@@ -2,10 +2,10 @@ import nodepub from 'nodepub';
 import path from 'path';
 import sanitizeHtml from 'sanitize-html';
 
-import normalizeHtml from '../utils/normalizeHtml';
-import type { Fic } from '../sites/site';
-import { curl } from '../network';
-import { log } from '../utils/log';
+import normalizeHtml from '../utils/normalizeHtml.js';
+import type { Fic } from '../sites/site.js';
+import { curl } from '../network.js';
+import { log } from '../utils/log.js';
 
 // Add `img` to allowedTags for sanitize-html
 const allowedTags = [

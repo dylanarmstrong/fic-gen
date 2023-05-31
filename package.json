@@ -6,11 +6,13 @@
   "bugs": {
     "url": "https://github.com/dylanarmstrong/fic-gen/issues"
   },
+  "main": "./lib/index.js",
   "license": "ISC",
   "repository": {
     "type": "git",
     "url": "https://github.com/dylanarmstrong/fic-gen"
   },
+  "type": "module",
   "version": "0.0.1",
   "bin": {
     "fic-gen": "./lib/index.js"
