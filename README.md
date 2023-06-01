@@ -20,6 +20,7 @@ the path will be shown as an error message.
 
 1. `pnpm install`
 2. `pnpm run build`
+3. `pnpm add -g $(pwd)`
 
 ## Working Sites
 
