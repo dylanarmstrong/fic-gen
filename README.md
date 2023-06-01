@@ -8,13 +8,13 @@ Download the latest [curl-impersonate](https://github.com/lwthiker/curl-imperson
 move the files into the `curl-impersonate` folder.
 
 If you are unsure where the `curl-impersonate` folder is, run the program once with `fic-gen` and
-the path will be outputted as an error message.
+the path will be shown as an error message.
 
 `fic-gen https://www.example.com/`
 
 ## Installation
 
-1. `npm i -g @dylanarmstrong/fic-gen`
+1. `pnpm add -g @dylanarmstrong/fic-gen`
 
 ## Installation (from source)
 
@@ -36,3 +36,12 @@ Requires passing in a valid `cf_clearance` cookie.
 ```bash
 fic-gen -c cf_clearance=123 https://www.fanfiction.net/s/12345/1/story-title
 ```
+
+## TODO
+
+* Retry for failing curl
+* What is max title length on kindle
+* Title shouldn't have multiple spaces in row (https://www.royalroad.com/fiction/65108/death-loot-vampires)
+* Site Support:
+    * Xenforo General
+    * Fictionpress

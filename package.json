@@ -1,41 +1,22 @@
 {
-  "name": "@dylanarmstrong/fic-gen",
   "author": "Dylan Armstrong <dylan@dylan.is>",
-  "description": "ePub output for online web fiction",
-  "homepage": "https://github.com/dylanarmstrong/fic-gen",
-  "bugs": {
-    "url": "https://github.com/dylanarmstrong/fic-gen/issues"
-  },
-  "license": "ISC",
-  "exports": "./lib/index.js",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/dylanarmstrong/fic-gen"
-  },
-  "type": "module",
-  "version": "0.0.1",
   "bin": {
     "fic-gen": "./lib/index.js"
   },
-  "scripts": {
-    "build": "tsc",
-    "lint": "prettier --write --ignore-unknown src/* && eslint src/"
+  "bugs": {
+    "url": "https://github.com/dylanarmstrong/fic-gen/issues"
   },
-  "engines": {
-    "node": ">16.0.0"
-  },
-  "eslintConfig": {
-    "extends": [
-      "@dylanarmstrong",
-      "prettier"
-    ],
-    "rules": {
-      "dot-notation": "off"
-    }
-  },
-  "prettier": {
-    "singleQuote": true,
-    "trailingComma": "all"
+  "description": "ePub output for online web fiction",
+  "dependencies": {
+    "argparse": "^2.0.1",
+    "cheerio": "1.0.0-rc.12",
+    "defaults": "^2.0.1",
+    "htmlparser2": "^9.0.0",
+    "md5": "^2.3.0",
+    "nodepub": "^3.0.8",
+    "parse5": "^7.1.2",
+    "sanitize-html": "^2.10.0",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@dylanarmstrong/eslint-config": "^0.4.0",
@@ -55,15 +36,37 @@
     "prettier": "^2.8.8",
     "typescript": "^5.0.4"
   },
-  "dependencies": {
-    "argparse": "^2.0.1",
-    "cheerio": "1.0.0-rc.12",
-    "defaults": "^2.0.1",
-    "htmlparser2": "^9.0.0",
-    "md5": "^2.3.0",
-    "nodepub": "^3.0.8",
-    "parse5": "^7.1.2",
-    "sanitize-html": "^2.10.0",
-    "uuid": "^9.0.0"
-  }
+  "engines": {
+    "node": ">16.0.0"
+  },
+  "eslintConfig": {
+    "extends": [
+      "@dylanarmstrong",
+      "prettier"
+    ],
+    "rules": {
+      "dot-notation": "off"
+    }
+  },
+  "exports": "./lib/index.js",
+  "files": [
+    "./lib"
+  ],
+  "license": "ISC",
+  "homepage": "https://github.com/dylanarmstrong/fic-gen",
+  "name": "@dylanarmstrong/fic-gen",
+  "prettier": {
+    "singleQuote": true,
+    "trailingComma": "all"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dylanarmstrong/fic-gen"
+  },
+  "scripts": {
+    "build": "tsc && chmod +x ./lib/index.js",
+    "lint": "prettier --write --ignore-unknown src/* && eslint src/"
+  },
+  "type": "module",
+  "version": "0.0.1"
 }

@@ -1,3 +1,4 @@
+import defaults from 'defaults';
 import type { AnyNode, Cheerio, CheerioAPI } from 'cheerio';
 
 import loadHtml from '../utils/loadHtml.js';
@@ -16,6 +17,11 @@ type Chapter = {
   url: string;
   words: number;
 };
+
+type GetChapterOptions = Partial<{
+  checkValidity: boolean;
+  checkCache: boolean;
+}>;
 
 type Fic = {
   author: Author;
@@ -50,12 +56,16 @@ interface ISite {
   };
 
   getAuthor($chapter: CheerioAPI): Author;
-  getChapter(url: URL): Promise<string | null>;
+  getChapter(
+    url: URL,
+    chapterOptions: GetChapterOptions,
+  ): Promise<string | null>;
   getChapterTitle($chapter: CheerioAPI): string;
   getChapterWords(content: string | null): number;
   getCover($chapter: CheerioAPI): Promise<URL | null>;
   getDescription($chapter: CheerioAPI): string;
   getFic(): Promise<Fic | null>;
+  getIndex(url: URL): ReturnType<ISite['getChapter']>;
   getNumberOfChapters($chapter: CheerioAPI): number;
   getStoryTitle($chapter: CheerioAPI): string;
   getTags($chapter: CheerioAPI): string[];
@@ -70,6 +80,11 @@ interface ISite {
   transformChapter($content: Cheerio<AnyNode>): Cheerio<AnyNode>;
   transformImages($content: Cheerio<AnyNode>): Promise<Cheerio<AnyNode>>;
 }
+
+const defaultChapterOptions = {
+  checkCache: false,
+  checkValidity: false,
+} as const;
 
 abstract class Site implements ISite {
   cookie = '';
@@ -103,17 +118,26 @@ abstract class Site implements ISite {
     };
   }
 
-  // TODO: pass in actual options
-  async getChapter(url: URL, checkValidity = true) {
-    // TODO: change this cache check
+  async getChapter(url: URL, chapterOptions: GetChapterOptions = {}) {
+    const { checkCache, checkValidity }: Required<GetChapterOptions> = defaults(
+      chapterOptions,
+      defaultChapterOptions,
+    );
+
     const [chapter] = await curl(url, {
       append: this.options,
-      cache: checkValidity,
+      cache: checkCache,
     });
+
     if (!checkValidity || (checkValidity && this.isValidChapter(chapter))) {
       return chapter;
     }
+
     return null;
+  }
+
+  async getIndex(url: URL) {
+    return this.getChapter(url, { checkCache: false, checkValidity: false });
   }
 
   getChapterTitle($chapter: CheerioAPI) {

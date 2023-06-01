@@ -22,7 +22,7 @@ class FanFiction extends Site {
   }
 
   async getFic() {
-    let chapter = await this.getChapter(this.url, false);
+    let chapter = await this.getIndex(this.url);
     if (chapter === null) {
       error(`Chapter: ${this.url.href} is null`);
       return null;

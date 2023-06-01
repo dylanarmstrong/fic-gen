@@ -1,19 +1,4 @@
 #!/usr/bin/env node
-/**
- * TODO
- *
- * Retry for failing curl
- * Max title length? For kindle -- test with the editor story
- * Add skip cache for use on initial page, so chapter list isn't cached
- * Title shouldn't have multiple spaces in row (https://www.royalroad.com/fiction/65108/death-loot-vampires)
- * getChatper should take options
- * Don't rely on checkValidity for cache -- just a quick temp change
- *
- * Site Support:
- * Xenforo General
- * Fictionpress
- *
- */
 
 import { ArgumentParser, RawTextHelpFormatter } from 'argparse';
 import { access, mkdir } from 'node:fs/promises';
