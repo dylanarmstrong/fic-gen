@@ -82,8 +82,8 @@ interface ISite {
 }
 
 const defaultChapterOptions = {
-  checkCache: false,
-  checkValidity: false,
+  checkCache: true,
+  checkValidity: true,
 } as const;
 
 abstract class Site implements ISite {
