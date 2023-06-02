@@ -1,7 +1,7 @@
-import { v4 as uuidv4 } from 'uuid';
 import type { Element } from 'cheerio';
+import { sep } from 'node:path';
 
-import { curl } from '../network.js';
+import { curl, getCachePath } from '../network.js';
 
 const loadImage = async (img: Element): Promise<string | null> => {
   const { src } = img.attribs;
@@ -13,7 +13,8 @@ const loadImage = async (img: Element): Promise<string | null> => {
     const srcSplit = src.split('/');
     const end = srcSplit.length > 0 ? srcSplit[srcSplit.length - 1] : null;
     if (end) {
-      const filename = `${uuidv4()}-${end}`;
+      const split = getCachePath(url).split(sep);
+      const filename = split[split.length - 1];
       img.attribs['src'] = `../images/${filename}`;
       img.attribs['alt'] = img.attribs['alt'] || 'image';
       const [, filepath] = await curl(url);

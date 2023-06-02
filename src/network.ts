@@ -1,6 +1,6 @@
 import defaults from 'defaults';
 import md5 from 'md5';
-import path from 'node:path';
+import { extname, join } from 'node:path';
 import { access, readFile } from 'node:fs/promises';
 import { constants } from 'node:fs';
 import { exec as execSync } from 'node:child_process';
@@ -27,7 +27,11 @@ const setCookie = (_cookie: string) => {
   cookie = _cookie;
 };
 
-const getCachePath = (url: URL) => path.join(cachePath, md5(url.href));
+const getCachePath = (url: URL) => {
+  const { href, pathname } = url;
+  const filename = `${md5(href)}${extname(pathname)}`;
+  return join(cachePath, filename);
+};
 
 const getCache = async (file: string) => {
   try {
@@ -81,4 +85,4 @@ const curl = async (
   return [await getCache(cacheFile), cacheFile];
 };
 
-export { curl, setAgent, setCache, setCookie };
+export { curl, getCachePath, setAgent, setCache, setCookie };

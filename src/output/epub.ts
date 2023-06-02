@@ -1,4 +1,5 @@
-import nodepub from 'nodepub';
+import { createEpub } from '@dylanarmstrong/nodepub';
+import type { CoverType, Section } from '@dylanarmstrong/nodepub';
 import path from 'node:path';
 import sanitizeHtml from 'sanitize-html';
 
@@ -84,23 +85,14 @@ const allowedTags = [
 
 const write = async (fic: Fic, outputPath: string) => {
   const { cover, title } = fic;
-  let filepath = '/Users/dylan/Desktop/z.png';
+  let filepath = title;
+  let coverType: CoverType = 'text';
   if (cover) {
     [, filepath] = await curl(cover);
+    coverType = 'image';
   }
 
-  const metadata = {
-    author: fic.author.text,
-    cover: filepath,
-    id: fic.id,
-    images: fic.images,
-    publisher: fic.publisher,
-    title,
-  };
-
-  const epub = nodepub.document(metadata);
-
-  epub.addCSS(`
+  const css = `
     table {
       border: 3px double #ccc;
       margin-left: auto;
@@ -117,26 +109,41 @@ const write = async (fic: Fic, outputPath: string) => {
     th:after {
       content: ":";
     }
-  `);
+  `;
 
   const { chapters } = fic;
-  for (const chapter of chapters) {
+  const sections: Section[] = [];
+  chapters.forEach((chapter) => {
     const { text, title: chapterTitle } = chapter;
     if (text) {
-      epub.addSection(
-        chapterTitle,
-        sanitizeHtml(
+      sections.push({
+        content: sanitizeHtml(
           normalizeHtml(`
-            <header><h2>${chapterTitle}</h2></header>
+            <h1>${chapterTitle}</h1>
             ${text}
           `),
           {
             allowedTags,
           },
         ),
-      );
+        title: chapterTitle,
+      });
     }
-  }
+  });
+
+  const metadata = {
+    author: fic.author.text,
+    cover: filepath,
+    coverType,
+    css,
+    id: fic.id,
+    images: fic.images,
+    publisher: fic.publisher,
+    sections,
+    title,
+  };
+
+  const epub = createEpub(metadata);
 
   const outputTitle = title.replace(/[^a-zA-Z0-9!()[\]. ]/g, ' ');
   log(
@@ -145,7 +152,8 @@ const write = async (fic: Fic, outputPath: string) => {
       outputTitle,
     )}.epub'`,
   );
-  await epub.writeEPUB(outputPath, outputTitle);
+
+  await epub.write(outputPath, outputTitle);
 };
 
 export default write;

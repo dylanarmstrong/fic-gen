@@ -8,12 +8,12 @@
   },
   "description": "ePub output for online web fiction",
   "dependencies": {
+    "@dylanarmstrong/nodepub": "^4.0.0",
     "argparse": "^2.0.1",
     "cheerio": "1.0.0-rc.12",
     "defaults": "^2.0.1",
     "htmlparser2": "^9.0.0",
     "md5": "^2.3.0",
-    "nodepub": "^3.0.8",
     "parse5": "^7.1.2",
     "sanitize-html": "^2.10.0",
     "uuid": "^9.0.0"
