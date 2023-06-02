@@ -8,7 +8,7 @@
   },
   "description": "ePub output for online web fiction",
   "dependencies": {
-    "@dylanarmstrong/nodepub": "^4.0.0",
+    "@dylanarmstrong/nodepub": "link:../nodepub",
     "argparse": "^2.0.1",
     "cheerio": "1.0.0-rc.12",
     "defaults": "^2.0.1",

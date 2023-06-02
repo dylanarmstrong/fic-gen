@@ -6,7 +6,7 @@ settings:
 
 dependencies:
   '@dylanarmstrong/nodepub':
-    specifier: ^4.0.0
+    specifier: link:../nodepub
     version: 4.0.0(eslint@8.41.0)
   argparse:
     specifier: ^2.0.1

@@ -137,13 +137,16 @@ const write = async (fic: Fic, outputPath: string) => {
     coverType,
     css,
     id: fic.id,
-    images: fic.images,
     publisher: fic.publisher,
-    sections,
     title,
   };
 
-  const epub = createEpub(metadata);
+  const epub = createEpub({
+    css,
+    images: fic.images,
+    metadata,
+    sections,
+  });
 
   const outputTitle = title.replace(/[^a-zA-Z0-9!()[\]. ]/g, ' ');
   log(
