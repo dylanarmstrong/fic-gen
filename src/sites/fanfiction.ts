@@ -91,7 +91,7 @@ class FanFiction extends Site {
     }
 
     try {
-      return new URL(`https://www.fanfiction.net${src}`);
+      return new URL(`https://www.fanfiction.net${src}/cover.jpg`);
     } catch (e) {
       return null;
     }

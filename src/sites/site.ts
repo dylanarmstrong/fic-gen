@@ -204,7 +204,7 @@ abstract class Site implements ISite {
     return {
       chapter: chapterNumber,
       text,
-      title: this.getChapterTitle($chapter),
+      title: this.getChapterTitle($chapter) || `Chapter ${chapterNumber}`,
       url: url.href,
       words: this.getChapterWords(text),
     };
