@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@dylanarmstrong/nodepub':
-    specifier: link:../nodepub
-    version: 4.0.0(eslint@8.41.0)
+    specifier: ^4.0.1
+    version: 4.0.1(eslint@8.41.0)
   argparse:
     specifier: ^2.0.1
     version: 2.0.1
@@ -49,9 +49,6 @@ devDependencies:
   '@types/node':
     specifier: ^20.2.5
     version: 20.2.5
-  '@types/nodepub':
-    specifier: ^3.0.0
-    version: 3.0.0
   '@types/sanitize-html':
     specifier: ^2.9.0
     version: 2.9.0
@@ -121,13 +118,13 @@ packages:
       chalk: 4.1.2
       eslint: 8.41.0
 
-  /@dylanarmstrong/nodepub@4.0.0(eslint@8.41.0):
-    resolution: {integrity: sha512-B0Fl7koiepKdgdo89SkIxnUVVQ64q8xDv1dCak5c6vgb96a9EsLf7omWMPjIO0gV+xXGtqOygyGSbYdnR2FSCg==}
+  /@dylanarmstrong/nodepub@4.0.1(eslint@8.41.0):
+    resolution: {integrity: sha512-GRYQKjFqjMDUqntEk19OZHOA7zy5PrjtJ8eDmZTG563xCzxTd62uv6Ceq6NQY3vbtafPWqE0DXyJX/jD11Feqg==}
+    engines: {node: '>16.0.0'}
     dependencies:
       '@dylanarmstrong/eslint-config': 0.4.0(eslint@8.41.0)
       archiver: 5.3.1
       defaults: 2.0.1
-      html-entities: 2.3.3
       pug: 3.0.2
     transitivePeerDependencies:
       - eslint
@@ -235,10 +232,6 @@ packages:
 
   /@types/node@20.2.5:
     resolution: {integrity: sha512-JJulVEQXmiY9Px5axXHeYGLSjhkZEnD+MDPDGbCbIAbMslkKwmygtZFy1X6s/075Yo94sf8GuSlFfPzysQrWZQ==}
-    dev: true
-
-  /@types/nodepub@3.0.0:
-    resolution: {integrity: sha512-wFytRid1HpSe4HKuUFm1LAbGOK35sLLH2jDe66SYRTmF/OUmyTWL2IxY6zMAyZDdKj5KlTMkWEcUyydltXCjrA==}
     dev: true
 
   /@types/sanitize-html@2.9.0:
@@ -1367,10 +1360,6 @@ packages:
     engines: {node: '>= 0.4.0'}
     dependencies:
       function-bind: 1.1.1
-
-  /html-entities@2.3.3:
-    resolution: {integrity: sha512-DV5Ln36z34NNTDgnz0EWGBLZENelNAtkiFA4kyNOG2tDI6Mz1uSWiq1wAKdyjnJwyDiDO7Fa2SO1CTxPXL8VxA==}
-    dev: false
 
   /htmlparser2@8.0.2:
     resolution: {integrity: sha512-GYdjWKDkbRLkZ5geuHs5NY1puJ+PXwP7+fHPRz06Eirsb9ugf6d8kkXav6ADhcODhFFPMIXyxkxSuMf3D6NCFA==}

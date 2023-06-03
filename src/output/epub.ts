@@ -1,5 +1,5 @@
-import { createEpub } from '@dylanarmstrong/nodepub';
-import type { CoverType, Section } from '@dylanarmstrong/nodepub';
+import Epub from '@dylanarmstrong/nodepub';
+import type { Section } from '@dylanarmstrong/nodepub';
 import path from 'node:path';
 import sanitizeHtml from 'sanitize-html';
 
@@ -86,7 +86,7 @@ const allowedTags = [
 const write = async (fic: Fic, outputPath: string) => {
   const { cover, title } = fic;
   let filepath = title;
-  let coverType: CoverType = 'text';
+  let coverType: 'text' | 'image' = 'text';
   if (cover) {
     [, filepath] = await curl(cover);
     coverType = 'image';
@@ -134,17 +134,20 @@ const write = async (fic: Fic, outputPath: string) => {
   const metadata = {
     author: fic.author.text,
     cover: filepath,
-    coverType,
-    css,
     id: fic.id,
     publisher: fic.publisher,
     title,
   };
 
-  const epub = createEpub({
+  const options = {
+    coverType,
+  };
+
+  const epub = new Epub({
     css,
     images: fic.images,
     metadata,
+    options,
     sections,
   });
 
