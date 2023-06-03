@@ -1,4 +1,7 @@
 # CHANGE LOG
+## 2023-07-03 - v0.0.5
+- Remove empty attributes from `img` tags
+
 ## 2023-07-03 - v0.0.4
 - Use version for `-v` from `package.json` instead of hardcoded
 - Update default user agent, useful on CF protected sites
