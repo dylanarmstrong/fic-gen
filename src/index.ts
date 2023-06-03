@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { ArgumentParser, RawTextHelpFormatter } from 'argparse';
-import { access, mkdir } from 'node:fs/promises';
+import { access, mkdir, readFile } from 'node:fs/promises';
 import { constants } from 'node:fs';
 
 import ArchiveOfOurOwn from './sites/archiveofourown.js';
@@ -17,6 +17,10 @@ import {
 import write from './output/epub.js';
 import { setAgent, setCache, setCookie } from './network.js';
 import { setDebugMode } from './utils/debugMode.js';
+
+const { version }: { version: string } = JSON.parse(
+  String(await readFile(new URL('../package.json', import.meta.url))),
+);
 
 type Args = {
   agent: string;
@@ -41,7 +45,7 @@ Supports:
 
 parser.add_argument('-a', '--agent', {
   default:
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.3 Safari/605.1.15',
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.5 Safari/605.1.15',
   help: 'the user agent for curl',
   type: String,
 });
@@ -68,7 +72,7 @@ parser.add_argument('-o', '--output', {
   help: 'the output directory',
   type: String,
 });
-parser.add_argument('-v', '--version', { action: 'version', version: '0.0.1' });
+parser.add_argument('-v', '--version', { action: 'version', version });
 parser.add_argument('url', { help: 'the url to retrieve', type: String });
 const args: Args = parser.parse_args();
 
