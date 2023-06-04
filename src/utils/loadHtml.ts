@@ -1,3 +1,4 @@
+import type { CheerioAPI } from 'cheerio';
 import { load as cheerioLoad } from 'cheerio';
 import { parseDocument } from 'htmlparser2';
 
@@ -8,6 +9,6 @@ const options = {
   xmlMode: true,
 };
 
-const loadHtml = (html: string) => cheerioLoad(parseDocument(html, options));
+const loadHtml = (html: string): CheerioAPI => cheerioLoad(parseDocument(html, options));
 
 export default loadHtml;

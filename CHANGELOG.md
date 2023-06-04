@@ -1,4 +1,7 @@
 # CHANGE LOG
+## 2023-07-04 - v0.0.8
+- Publish with types
+
 ## 2023-07-04 - v0.0.7
 - Switch to `@dylanarmstrong/tsconfig` for shared TS config
 - Add `LICENSE` file

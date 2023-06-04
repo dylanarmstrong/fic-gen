@@ -9,8 +9,8 @@ dependencies:
     specifier: ^4.1.0
     version: 4.1.0(eslint@8.42.0)
   '@dylanarmstrong/tsconfig':
-    specifier: ^0.0.1
-    version: 0.0.1
+    specifier: ^0.0.2
+    version: 0.0.2
   argparse:
     specifier: ^2.0.1
     version: 2.0.1
@@ -135,8 +135,8 @@ packages:
       - eslint
     dev: false
 
-  /@dylanarmstrong/tsconfig@0.0.1:
-    resolution: {integrity: sha512-CChMOYYSlj37cggPDZWjvpCsfiEzzhrNwDY4MQ2kOe4sCojSjL3wkwZDQed6YeCVlGlx2GqdHgpWCcbbKpUDTg==}
+  /@dylanarmstrong/tsconfig@0.0.2:
+    resolution: {integrity: sha512-nvJfte/n74in70bjGy+/CYU9Mj0RMNkBokQvThC3fqURKmeO2FSQeytVthmr1hnMcQJ7IxseQ1o7CSKb12iesA==}
     engines: {node: '>16.0.0'}
     dev: false
 
