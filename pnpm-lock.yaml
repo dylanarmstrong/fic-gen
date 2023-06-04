@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@dylanarmstrong/nodepub':
-    specifier: ^4.0.2
-    version: 4.0.2(eslint@8.42.0)
+    specifier: ^4.1.0
+    version: 4.1.0(eslint@8.42.0)
   argparse:
     specifier: ^2.0.1
     version: 2.0.1
@@ -118,14 +118,16 @@ packages:
       chalk: 4.1.2
       eslint: 8.42.0
 
-  /@dylanarmstrong/nodepub@4.0.2(eslint@8.42.0):
-    resolution: {integrity: sha512-ktzqxABACuvgLg7VuoafjIGaGwj0Ky5mRw5GUrNORxaw53YHLy9yhhI5JFDBe8188wfe80sjSWWqrHJlIsQsBQ==}
+  /@dylanarmstrong/nodepub@4.1.0(eslint@8.42.0):
+    resolution: {integrity: sha512-E3RqJ4AKWNWs0XaCSneQktob9poH5dSYiaImiHeT5e5kZ738EXe7MEK+REr3Hcctnkuk0G0ckeZYbhjjIfY8XA==}
     engines: {node: '>16.0.0'}
     dependencies:
       '@dylanarmstrong/eslint-config': 0.4.0(eslint@8.42.0)
       archiver: 5.3.1
       defaults: 2.0.1
+      mime: 3.0.0
       pug: 3.0.2
+      uuid: 9.0.0
     transitivePeerDependencies:
       - eslint
     dev: false
@@ -1707,6 +1709,12 @@ packages:
       braces: 3.0.2
       picomatch: 2.3.1
     dev: true
+
+  /mime@3.0.0:
+    resolution: {integrity: sha512-jSCU7/VB1loIWBZe14aEYHU/+1UMEHoaO7qxCOVJOw9GgH72VAWppxNcjU+x9a2k3GSIBXNKxXQFqRvvZ7vr3A==}
+    engines: {node: '>=10.0.0'}
+    hasBin: true
+    dev: false
 
   /mimic-fn@2.1.0:
     resolution: {integrity: sha512-OqbOk5oEQeAZ8WXWydlu9HJjz9WVdEIvamMCcXmuqUYjTknH/sqsWvhQ3vgwKFRR1HpjvNBKQ37nbJgYzGqGcg==}

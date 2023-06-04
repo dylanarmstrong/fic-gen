@@ -1,7 +1,8 @@
 import Epub from '@dylanarmstrong/nodepub';
-import type { Section } from '@dylanarmstrong/nodepub';
-import path from 'node:path';
+import { extname, join } from 'node:path';
 import sanitizeHtml from 'sanitize-html';
+import type { Resource, Section } from '@dylanarmstrong/nodepub';
+import { readFile } from 'node:fs/promises';
 
 import normalizeHtml from '../utils/normalizeHtml.js';
 import type { Fic } from '../sites/site.js';
@@ -12,9 +13,18 @@ const write = async (fic: Fic, outputPath: string) => {
   const { cover, title } = fic;
   let filepath = title;
   let coverType: 'text' | 'image' = 'text';
+  let coverData: Resource = {
+    data: Buffer.from([0]),
+    name: 'cover.jpg',
+  };
+
   if (cover) {
     [, filepath] = await curl(cover);
     coverType = 'image';
+    coverData = {
+      data: await readFile(filepath),
+      name: `cover.${extname(filepath) || 'jpg'}`,
+    };
   }
 
   const css = `
@@ -50,13 +60,12 @@ const write = async (fic: Fic, outputPath: string) => {
           {
             allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img']),
             transformTags: {
-              // EPUB3.3 really dislikes images with empty width and such
-              // TODO: Is this safe to do as a *
-              img: function (tagName, attribs) {
+              // XML really dislikes empty attributes
+              '*': function (tagName, attribs) {
                 const cleanAttribs = { ...attribs };
 
                 Object.keys(cleanAttribs).forEach((key) => {
-                  const value = cleanAttribs[key].trim();
+                  const value = String(cleanAttribs[key]).trim();
                   if (value === '') {
                     delete cleanAttribs[key];
                   }
@@ -75,29 +84,41 @@ const write = async (fic: Fic, outputPath: string) => {
     }
   });
 
+  const cleanTitle = sanitizeHtml(title);
+  if (coverType === 'text') {
+    filepath = cleanTitle;
+  }
+
   const metadata = {
     author: fic.author.text,
-    cover: filepath,
+    cover: coverType === 'text' ? cleanTitle : coverData,
     id: fic.id,
     publisher: fic.publisher,
-    title,
+    title: cleanTitle,
   };
 
   const options = {
     coverType,
   };
 
+  const resources = await Promise.all(
+    fic.images.map(async (image) => ({
+      data: await readFile(image),
+      name: image,
+    })),
+  );
+
   const epub = new Epub({
     css,
-    images: fic.images,
     metadata,
     options,
+    resources,
     sections,
   });
 
   const outputTitle = title.replace(/[^a-zA-Z0-9!()[\]. ]/g, ' ');
   log(
-    `Writing EPUB for '${title}' to '${path.join(
+    `Writing EPUB for '${title}' to '${join(
       outputPath,
       outputTitle,
     )}.epub'`,

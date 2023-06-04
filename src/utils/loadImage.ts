@@ -15,7 +15,7 @@ const loadImage = async (img: Element): Promise<string | null> => {
     if (end) {
       const split = getCachePath(url).split(sep);
       const filename = split[split.length - 1];
-      img.attribs['src'] = `../images/${filename}`;
+      img.attribs['src'] = `../resources/${filename}`;
       img.attribs['alt'] = img.attribs['alt'] || 'image';
       const [, filepath] = await curl(url);
       return filepath;

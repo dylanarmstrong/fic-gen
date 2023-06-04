@@ -7,7 +7,7 @@
     "url": "https://github.com/dylanarmstrong/fic-gen/issues"
   },
   "dependencies": {
-    "@dylanarmstrong/nodepub": "^4.0.2",
+    "@dylanarmstrong/nodepub": "^4.1.0",
     "argparse": "^2.0.1",
     "cheerio": "1.0.0-rc.12",
     "defaults": "^2.0.1",
@@ -58,6 +58,7 @@
     "singleQuote": true,
     "trailingComma": "all"
   },
+  "private": false,
   "repository": {
     "type": "git",
     "url": "https://github.com/dylanarmstrong/fic-gen"
@@ -67,5 +68,5 @@
     "lint": "prettier --write --ignore-unknown src/* && eslint src/"
   },
   "type": "module",
-  "version": "0.0.5"
+  "version": "0.0.6"
 }
