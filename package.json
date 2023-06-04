@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@dylanarmstrong/nodepub": "^4.1.0",
+    "@dylanarmstrong/tsconfig": "^0.0.1",
     "argparse": "^2.0.1",
     "cheerio": "1.0.0-rc.12",
     "defaults": "^2.0.1",
@@ -68,5 +69,5 @@
     "lint": "prettier --write --ignore-unknown src/* && eslint src/"
   },
   "type": "module",
-  "version": "0.0.6"
+  "version": "0.0.7"
 }

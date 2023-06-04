@@ -1,4 +1,8 @@
 # CHANGE LOG
+## 2023-07-04 - v0.0.7
+- Switch to `@dylanarmstrong/tsconfig` for shared TS config
+- Add `LICENSE` file
+
 ## 2023-07-04 - v0.0.6
 - Update `@dylanarmstrong/nodepub` version along with `images` -> `resources`
 - **FIX**: Clean story title to avoid `&`
