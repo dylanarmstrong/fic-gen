@@ -1,9 +1,9 @@
 import defaults from 'defaults';
 import md5 from 'md5';
-import { extname, join } from 'node:path';
 import { access, readFile } from 'node:fs/promises';
 import { constants } from 'node:fs';
 import { exec as execSync } from 'node:child_process';
+import { extname, join } from 'node:path';
 import { promisify } from 'node:util';
 
 import { cache as cachePath, curl as curlPath } from './utils/paths.js';

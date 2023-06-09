@@ -1,4 +1,4 @@
-import type { CheerioAPI } from 'cheerio';
+import type { AnyNode, Cheerio, CheerioAPI } from 'cheerio';
 
 import loadHtml from '../utils/loadHtml.js';
 import { Chapter, Site } from './site.js';
@@ -115,7 +115,20 @@ class Xenforo extends Site {
     )
       .text()
       .trim();
+
+    // TODO: I don't know if I like this?
+    // Idea: Compare a story that's on both SB and RR
+    // const text =
+    //   $content
+    //     .html()
+    //     ?.split('\n')
+    //     .map((line) => line.trim())
+    //     .filter(Boolean)
+    //     .map((line) => `<p>${line}</p>`)
+    //     .join('\n') || null;
+
     const text = $content.html();
+
     return {
       chapter: chapterNumber,
       text,
@@ -123,6 +136,11 @@ class Xenforo extends Site {
       url: url.href,
       words: this.getChapterWords(text),
     };
+  }
+
+  override transformChapter($content: Cheerio<AnyNode>) {
+    $content.find('br').remove();
+    return $content;
   }
 }
 

@@ -1,16 +1,18 @@
 import os from 'node:os';
-import path from 'node:path';
+import { join } from 'node:path';
 
 const { XDG_DATA_HOME } = process.env;
 
 const base = XDG_DATA_HOME
-  ? path.join(XDG_DATA_HOME, 'fic-gen')
-  : path.join(os.homedir(), '.fic-gen');
+  ? join(XDG_DATA_HOME, 'fic-gen')
+  : join(os.homedir(), '.fic-gen');
 
-const data = path.join(base, 'data');
+const data = join(base, 'data');
 
-const cache = path.join(base, 'cache');
+const cache = join(base, 'cache');
 
-const curl = path.join(base, 'curl-impersonate', 'curl-impersonate-ff');
+const curlHome = join(base, 'curl-impersonate');
 
-export { cache, curl, data };
+const curl = join(curlHome, 'curl-impersonate-ff');
+
+export { cache, curl, curlHome, data };

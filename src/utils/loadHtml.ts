@@ -9,6 +9,7 @@ const options = {
   xmlMode: true,
 };
 
-const loadHtml = (html: string): CheerioAPI => cheerioLoad(parseDocument(html, options));
+const loadHtml = (html: string): CheerioAPI =>
+  cheerioLoad(parseDocument(html, options));
 
 export default loadHtml;

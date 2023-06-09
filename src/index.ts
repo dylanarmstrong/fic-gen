@@ -12,11 +12,14 @@ import Xenforo from './sites/xenforo.js';
 import {
   cache as cachePath,
   curl as curlPath,
+  curlHome as curlHomePath,
   data as dataPath,
 } from './utils/paths.js';
 import write from './output/epub.js';
+import { log } from './utils/log.js';
 import { setAgent, setCache, setCookie } from './network.js';
 import { setDebugMode } from './utils/debugMode.js';
+import { setup } from './setup.js';
 
 const { version }: { version: string } = JSON.parse(
   String(await readFile(new URL('../package.json', import.meta.url))),
@@ -27,6 +30,7 @@ type Args = {
   cache: boolean;
   cookie: string;
   debug: boolean;
+  initialize: boolean;
   outputPath: string;
   url: string;
 };
@@ -59,6 +63,12 @@ parser.add_argument('-d', '--debug', {
   default: false,
   help: 'enable debug output',
 });
+parser.add_argument('-i', '--initialize', {
+  action: 'store_const',
+  const: true,
+  default: false,
+  help: 'initialize fic-gen',
+});
 parser.add_argument('--no-cache', {
   action: 'store_const',
   const: false,
@@ -77,12 +87,38 @@ parser.add_argument('url', { help: 'the url to retrieve', type: String });
 const args: Args = parser.parse_args();
 
 const { agent, cache, cookie, debug, outputPath, url } = args;
+let { initialize } = args;
+
+const hasCode = (e: unknown): e is { code: string } =>
+  Object.hasOwnProperty.call(e, 'code') &&
+  typeof (e as { code: unknown }).code === 'string';
 
 (async () => {
   setAgent(agent);
   setCache(cache);
   setCookie(cookie);
   setDebugMode(debug);
+
+  try {
+    await access(curlPath, constants.R_OK | constants.X_OK);
+  } catch {
+    initialize = true;
+  }
+
+  if (initialize) {
+    try {
+      await mkdir(curlHomePath);
+    } catch (e) {
+      // If directory already exists, that's fine
+      if ((hasCode(e) && e.code !== 'EEXIST') || !hasCode(e)) {
+        throw new Error(
+          `Unable to create curl-impersonate directory at ${curlHomePath}`,
+        );
+      }
+    }
+    log(`Downloading curl-impersonate to ${curlHomePath}`);
+    await setup();
+  }
 
   try {
     await access(curlPath, constants.R_OK | constants.X_OK);

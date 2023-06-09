@@ -1,7 +1,7 @@
 import Epub from '@dylanarmstrong/nodepub';
-import { extname, join } from 'node:path';
 import sanitizeHtml from 'sanitize-html';
 import type { Resource, Section } from '@dylanarmstrong/nodepub';
+import { extname, join } from 'node:path';
 import { readFile } from 'node:fs/promises';
 
 import normalizeHtml from '../utils/normalizeHtml.js';
@@ -44,6 +44,21 @@ const write = async (fic: Fic, outputPath: string) => {
     th:after {
       content: ":";
     }
+    .title {
+      display: block;
+      font-kerning: auto;
+      font-size: 1.25em;
+      font-style: normal;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      line-height: 1.2;
+      margin: 0 0 0.3em
+      page-break-inside: avoid;
+      text-align: center;
+    }
+    .title + *::first-letter {
+      font-size: 300%;
+    }
   `;
 
   const { chapters } = fic;
@@ -54,10 +69,23 @@ const write = async (fic: Fic, outputPath: string) => {
       sections.push({
         content: sanitizeHtml(
           normalizeHtml(`
-            <h1>${chapterTitle}</h1>
+            <h1 class='title'>${chapterTitle}</h1>
             ${text}
           `),
           {
+            allowedAttributes: {
+              a: ['href', 'name', 'target'],
+              h1: ['class'],
+              img: [
+                'src',
+                'srcset',
+                'alt',
+                'title',
+                'width',
+                'height',
+                'loading',
+              ],
+            },
             allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img']),
             transformTags: {
               // XML really dislikes empty attributes
@@ -117,12 +145,7 @@ const write = async (fic: Fic, outputPath: string) => {
   });
 
   const outputTitle = title.replace(/[^a-zA-Z0-9!()[\]. ]/g, ' ');
-  log(
-    `Writing EPUB for '${title}' to '${join(
-      outputPath,
-      outputTitle,
-    )}.epub'`,
-  );
+  log(`Writing EPUB for '${title}' to '${join(outputPath, outputTitle)}.epub'`);
 
   await epub.write(outputPath, outputTitle);
 };

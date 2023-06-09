@@ -4,13 +4,7 @@ Generate ePub when given a url.
 
 ## Usage
 
-Download the latest [curl-impersonate](https://github.com/lwthiker/curl-impersonate/releases) and
-move the files into the `curl-impersonate` folder.
-
-If you are unsure where the `curl-impersonate` folder is, run the program once with `fic-gen` and
-the path will be shown as an error message.
-
-`fic-gen https://www.example.com/`
+`fic-gen https://example.com`
 
 ## Installation
 
@@ -22,7 +16,7 @@ the path will be shown as an error message.
 2. `pnpm run build`
 3. `pnpm add -g $(pwd)`
 
-## Working Sites
+## Supported Sites
 
 * ArchiveOfOurOwn
 * BoxNovel
@@ -41,8 +35,13 @@ fic-gen -c cf_clearance=123 https://www.fanfiction.net/s/12345/1/story-title
 ## TODO
 
 * Retry for failing curl
-* What is max title length on kindle
-* Title shouldn't have multiple spaces in row (https://www.royalroad.com/fiction/65108/death-loot-vampires)
+* What is max title length on kindle?
+* Title shouldn't have multiple spaces in row https://www.royalroad.com/fiction/65108/death-loot-vampires
 * Site Support:
     * Xenforo General
     * Fictionpress
+* Royalroad: Support custom style <hr> tags: https://www.royalroad.com/fiction/58643/tenebroum/chapter/992389/ch-01-blood-money
+* Tests
+* Base64 images: https://forums.spacebattles.com/threads/easy-mode-gamer-multicross-si.491065/threadmarks
+* Maybe support for using `got` instead of `curl` on non-ff
+* Xenforo styling is off
