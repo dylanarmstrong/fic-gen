@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-import { ArgumentParser, RawTextHelpFormatter } from 'argparse';
-import { access, mkdir, readFile } from 'node:fs/promises';
+import { access, mkdir } from 'node:fs/promises';
 import { constants } from 'node:fs';
+import meow from 'meow';
 
 import ArchiveOfOurOwn from './sites/archiveofourown.js';
 import BoxNovel from './sites/boxnovel.js';
@@ -16,78 +16,113 @@ import {
   data as dataPath,
 } from './utils/paths.js';
 import write from './output/epub.js';
-import { log } from './utils/log.js';
+import { error, log } from './utils/log.js';
 import { setAgent, setCache, setCookie } from './network.js';
 import { setDebugMode } from './utils/debugMode.js';
 import { setup } from './setup.js';
 
-const { version }: { version: string } = JSON.parse(
-  String(await readFile(new URL('../package.json', import.meta.url))),
+const cli = meow(
+  `
+  Usage:
+    $ fic-gen url
+
+  Supports:
+    * ArchiveOfOurOwn
+    * BoxNovel
+    * FanFiction
+    * RoyalRoad
+    * SpaceBattles
+
+  required argument:
+    url                   the url to retrieve
+
+  optional arguments:
+    -h, --help            show this help message and exit
+    -a, --agent  <agent>
+                          the user agent for curl
+    -c, --cookie <cookie>
+                          cookie to pass to curl
+    -d, --debug           enable debug output
+    --no-cache            disable cache
+    -o, --output <output path>
+                          the output directory
+    -v, --version         show program's version number and exit`,
+  {
+    allowUnknownFlags: false,
+    flags: {
+      agent: {
+        default:
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.5 Safari/605.1.15',
+        shortFlag: 'a',
+        type: 'string',
+      },
+      cache: {
+        default: true,
+        shortFlag: 'c',
+        type: 'boolean',
+      },
+      cookie: {
+        default: '',
+        shortFlag: 'c',
+        type: 'string',
+      },
+      debug: {
+        default: false,
+        shortFlag: 'd',
+        type: 'boolean',
+      },
+      help: {
+        default: false,
+        shortFlag: 'h',
+        type: 'boolean',
+      },
+      initialize: {
+        default: false,
+        shortFlag: 'i',
+        type: 'boolean',
+      },
+      output: {
+        default: dataPath,
+        shortFlag: 'o',
+        type: 'string',
+      },
+      version: {
+        default: false,
+        shortFlag: 'v',
+        type: 'boolean',
+      },
+    },
+    importMeta: import.meta,
+    // Requires: https://github.com/sindresorhus/meow/pull/241
+    // indent: 0,
+  },
 );
 
-type Args = {
-  agent: string;
-  cache: boolean;
-  cookie: string;
-  debug: boolean;
-  initialize: boolean;
-  outputPath: string;
-  url: string;
-};
+const { flags, input } = cli;
+const [url] = input;
+const {
+  agent,
+  cache,
+  cookie,
+  debug,
+  help,
+  output: outputPath,
+  version,
+} = flags;
+let { initialize } = flags;
 
-const parser = new ArgumentParser({
-  description: `ePub output for online fiction
-Supports:
-  * ArchiveOfOurOwn
-  * BoxNovel
-  * FanFiction
-  * RoyalRoad
-  * SpaceBattles`,
-  // eslint-disable-next-line camelcase
-  formatter_class: RawTextHelpFormatter,
-});
+if (help) {
+  cli.showHelp();
+}
 
-parser.add_argument('-a', '--agent', {
-  default:
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.5 Safari/605.1.15',
-  help: 'the user agent for curl',
-  type: String,
-});
-parser.add_argument('-c', '--cookie', {
-  help: 'cookie to pass to curl',
-  type: String,
-});
-parser.add_argument('-d', '--debug', {
-  action: 'store_const',
-  const: true,
-  default: false,
-  help: 'enable debug output',
-});
-parser.add_argument('-i', '--initialize', {
-  action: 'store_const',
-  const: true,
-  default: false,
-  help: 'initialize fic-gen',
-});
-parser.add_argument('--no-cache', {
-  action: 'store_const',
-  const: false,
-  default: true,
-  dest: 'cache',
-  help: 'disable cache',
-});
-parser.add_argument('-o', '--output', {
-  default: dataPath,
-  dest: 'outputPath',
-  help: 'the output directory',
-  type: String,
-});
-parser.add_argument('-v', '--version', { action: 'version', version });
-parser.add_argument('url', { help: 'the url to retrieve', type: String });
-const args: Args = parser.parse_args();
+if (version) {
+  cli.showVersion();
+}
 
-const { agent, cache, cookie, debug, outputPath, url } = args;
-let { initialize } = args;
+if (!url) {
+  error('Please add the URL that you are trying to retrieve.');
+  cli.showHelp();
+}
 
 const hasCode = (e: unknown): e is { code: string } =>
   Object.hasOwnProperty.call(e, 'code') &&

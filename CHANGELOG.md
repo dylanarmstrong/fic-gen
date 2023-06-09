@@ -5,6 +5,7 @@
 - Styling on chapter title and first letter of chapter
 - Add setup code to automatically download `curl-impersonate`
 - Scaffolding for tests added
+- Switch to `meow` from `argparse`
 
 ## 2023-07-04 - v0.0.8
 - Publish with types
