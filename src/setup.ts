@@ -32,19 +32,23 @@ const getArch = (): string | null => {
   }
 };
 
-const setup = async (): Promise<boolean> => {
+const setup = async (): Promise<void> => {
   const platform = getPlatform();
   const arch = getArch();
-  if (platform === null || arch === null) {
-    return false;
+  if (platform === null) {
+    throw new Error('process.platform is not valid for curl-impersonate');
   }
+
+  if (arch === null) {
+    throw new Error('process.arch is not valid for curl-impersonate');
+  }
+
   const version = 'v0.5.4';
   const url = `https://github.com/lwthiker/curl-impersonate/releases/download/${version}/curl-impersonate-${version}.${arch}-${platform}.tar.gz`;
   const destName = join(os.tmpdir(), 'curl.tar.gz');
   debug(`Downloading ${url} to ${destName}`);
   await pipeline(got.stream(url), createWriteStream(destName));
   await decompress(destName, curlHomePath);
-  return false;
 };
 
 export { setup };

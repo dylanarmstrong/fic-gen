@@ -48,7 +48,7 @@ type CurlOptions = Partial<{
   cache: boolean;
 }>;
 
-const defaultCurlOptions = {
+const defaultCurlOptions: Required<CurlOptions> = {
   append: '',
   cache: true,
 };
@@ -58,7 +58,10 @@ const curl = async (
   url: URL,
   _options?: CurlOptions,
 ): Promise<[string, string]> => {
-  const options = defaults(_options, defaultCurlOptions);
+  const options: Required<CurlOptions> = defaults(
+    _options || {},
+    defaultCurlOptions,
+  );
   const cacheFile = getCachePath(url);
   if (options.cache && cache) {
     const cached = await getCache(cacheFile);
