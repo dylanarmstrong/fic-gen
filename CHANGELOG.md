@@ -5,7 +5,9 @@
 - Styling on chapter title and first letter of chapter
 - Add setup code to automatically download `curl-impersonate`
 - Scaffolding for tests added
-- Switch to `meow` from `argparse`
+- Switch to `@dylanarmstrong/meow` from `argparse`
+- Remove `display: none` lines from RoyalRoad
+- Rename `transformContent` -> `transformChapter` to better fit what it does
 
 ## 2023-07-04 - v0.0.8
 - Publish with types
