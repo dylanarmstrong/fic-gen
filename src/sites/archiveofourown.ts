@@ -77,7 +77,7 @@ class ArchiveOfOurOwn extends Site {
     return Number.parseInt($chapter('dd.chapters').text().split('/')[0]);
   }
 
-  override transformChapter($content: Cheerio<AnyNode>) {
+  override transformContent($content: Cheerio<AnyNode>) {
     $content.find('h3.landmark').remove();
     return $content;
   }

@@ -106,8 +106,10 @@ class Xenforo extends Site {
     url: URL,
   ): Promise<Chapter> {
     const $content = await this.transformImages(
-      this.transformChapter(
-        $chapter(`[data-content="${url.hash.slice(1)}"] article.message-body`),
+      this.transformContent(
+        this.transformChapter($chapter)(
+          `[data-content="${url.hash.slice(1)}"] article.message-body`,
+        ),
       ),
     );
     const title = $chapter(
@@ -138,7 +140,7 @@ class Xenforo extends Site {
     };
   }
 
-  override transformChapter($content: Cheerio<AnyNode>) {
+  override transformContent($content: Cheerio<AnyNode>) {
     $content.find('br').remove();
     return $content;
   }

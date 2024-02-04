@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
+import meow from '@dylanarmstrong/meow';
 import { access, mkdir } from 'node:fs/promises';
 import { constants } from 'node:fs';
-import meow from 'meow';
 
 import ArchiveOfOurOwn from './sites/archiveofourown.js';
 import BoxNovel from './sites/boxnovel.js';
@@ -36,10 +36,10 @@ const cli = meow(
   Examples:
     $ fic-gen -c cf_clearance=123 https://www.fanfiction.net/s/12345/1/story-title
 
-  required argument:
+  Required:
     url                   the url to retrieve
 
-  optional arguments:
+  Options:
     -h, --help            show this help message and exit
     -a, --agent  <agent>
                           the user agent for curl
@@ -95,9 +95,8 @@ const cli = meow(
         type: 'boolean',
       },
     },
+    helpIndent: 0,
     importMeta: import.meta,
-    // Requires: https://github.com/sindresorhus/meow/pull/241
-    // indent: 0,
   },
 );
 

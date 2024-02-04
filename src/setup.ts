@@ -1,7 +1,7 @@
 import decompress from 'decompress';
-import { got } from 'got';
 import os from 'node:os';
 import { createWriteStream } from 'node:fs';
+import { got } from 'got';
 import { join } from 'node:path';
 import { pipeline } from 'node:stream/promises';
 

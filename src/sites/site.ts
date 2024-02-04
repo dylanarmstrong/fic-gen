@@ -77,7 +77,8 @@ interface ISite {
     chapterNumber: number,
     url: URL,
   ): Promise<Chapter>;
-  transformChapter($content: Cheerio<AnyNode>): Cheerio<AnyNode>;
+  transformChapter($chapter: CheerioAPI): CheerioAPI;
+  transformContent($content: Cheerio<AnyNode>): Cheerio<AnyNode>;
   transformImages($content: Cheerio<AnyNode>): Promise<Cheerio<AnyNode>>;
 }
 
@@ -198,7 +199,9 @@ abstract class Site implements ISite {
     url: URL,
   ): Promise<Chapter> {
     const $content = await this.transformImages(
-      this.transformChapter($chapter(this.selectors.chapter)),
+      this.transformContent(
+        this.transformChapter($chapter)(this.selectors.chapter),
+      ),
     );
     const text = $content.html();
     return {
@@ -210,7 +213,11 @@ abstract class Site implements ISite {
     };
   }
 
-  transformChapter($content: Cheerio<AnyNode>) {
+  transformChapter($chapter: CheerioAPI) {
+    return $chapter;
+  }
+
+  transformContent($content: Cheerio<AnyNode>) {
     return $content;
   }
 

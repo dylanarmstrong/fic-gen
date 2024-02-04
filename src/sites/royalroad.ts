@@ -1,3 +1,4 @@
+import css from 'css';
 import type { CheerioAPI } from 'cheerio';
 
 import loadHtml from '../utils/loadHtml.js';
@@ -7,6 +8,12 @@ import { error } from '../utils/log.js';
 const hasData = (o: unknown): o is { data: string } =>
   Object.hasOwnProperty.call(o, 'data') &&
   typeof (o as { data: unknown }).data === 'string';
+
+const isRule = (o: unknown): o is css.Rule =>
+  (o as { type: string }).type === 'rule';
+
+const isDeclaration = (o: unknown): o is css.Declaration =>
+  (o as { type: string }).type === 'declaration';
 
 class RoyalRoad extends Site {
   override matcher = /^www.royalroad.com/;
@@ -100,6 +107,57 @@ class RoyalRoad extends Site {
     return {
       text: link.text().trim(),
       url: `https://www.royalroad.com${link.attr('href')?.trim() || ''}`,
+    };
+  }
+
+  override transformChapter($chapter: CheerioAPI) {
+    $chapter('style').each((_, style) => {
+      const [child] = style.children;
+      if (hasData(child)) {
+        const rules = css.parse(child.data).stylesheet?.rules;
+        if (rules) {
+          rules.forEach((rule) => {
+            let hasDisplayNone = false;
+            if (isRule(rule)) {
+              const { declarations, selectors } = rule;
+              declarations?.forEach((declaration) => {
+                if (isDeclaration(declaration)) {
+                  const { property, value } = declaration;
+                  if (property === 'display' && value === 'none') {
+                    hasDisplayNone = true;
+                  }
+                }
+              });
+              if (hasDisplayNone && selectors) {
+                selectors.forEach((selector) => {
+                  $chapter(selector).remove();
+                });
+              }
+            }
+          });
+        }
+      }
+    });
+    return $chapter;
+  }
+
+  override async parseChapter(
+    $chapter: CheerioAPI,
+    chapterNumber: number,
+    url: URL,
+  ): Promise<Chapter> {
+    const $content = await this.transformImages(
+      this.transformContent(
+        this.transformChapter($chapter)(this.selectors.chapter),
+      ),
+    );
+    const text = $content.html();
+    return {
+      chapter: chapterNumber,
+      text,
+      title: this.getChapterTitle($chapter) || `Chapter ${chapterNumber}`,
+      url: url.href,
+      words: this.getChapterWords(text),
     };
   }
 }
