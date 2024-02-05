@@ -22,7 +22,7 @@
   },
   "description": "ePub output for online web fiction",
   "devDependencies": {
-    "@dylanarmstrong/eslint-config": "^0.4.0",
+    "@dylanarmstrong/eslint-config": "^0.5.2",
     "@dylanarmstrong/tsconfig": "^0.0.2",
     "@jest/globals": "^29.7.0",
     "@types/argparse": "^2.0.14",
@@ -49,17 +49,7 @@
     "node": ">=18.0.0"
   },
   "eslintConfig": {
-    "extends": [
-      "@dylanarmstrong",
-      "prettier"
-    ],
-    "parserOptions": {
-      "warnOnUnsupportedTypeScriptVersion": false
-    },
-    "rules": {
-      "@typescript-eslint/no-duplicate-imports": "off",
-      "dot-notation": "off"
-    }
+    "extends": "@dylanarmstrong"
   },
   "exports": "./lib/index.js",
   "files": [
