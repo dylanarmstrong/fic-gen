@@ -8,6 +8,8 @@
 - Switch to `@dylanarmstrong/meow` from `argparse`
 - Remove `display: none` lines from RoyalRoad
 - Rename `transformContent` -> `transformChapter` to better fit what it does
+- Update to new `sanitize-html` for empty attributes to be removed
+- Remove empty image tags
 
 ## 2023-07-04 - v0.0.8
 - Publish with types

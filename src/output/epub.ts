@@ -66,47 +66,38 @@ const write = async (fic: Fic, outputPath: string) => {
   chapters.forEach((chapter) => {
     const { text, title: chapterTitle } = chapter;
     if (text) {
-      sections.push({
-        content: sanitizeHtml(
-          normalizeHtml(`
-            <h1 class='title'>${chapterTitle}</h1>
-            ${text}
-          `),
-          {
-            allowedAttributes: {
-              a: ['href', 'name', 'target'],
-              h1: ['class'],
-              img: [
-                'src',
-                'srcset',
-                'alt',
-                'title',
-                'width',
-                'height',
-                'loading',
-              ],
-            },
-            allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img']),
-            transformTags: {
-              // XML really dislikes empty attributes
-              '*': function (tagName, attribs) {
-                const cleanAttribs = { ...attribs };
-
-                Object.keys(cleanAttribs).forEach((key) => {
-                  const value = String(cleanAttribs[key]).trim();
-                  if (value === '') {
-                    delete cleanAttribs[key];
-                  }
-                });
-
-                return {
-                  attribs: cleanAttribs,
-                  tagName,
-                };
-              },
-            },
+      const content = sanitizeHtml(
+        normalizeHtml(`
+          <h1 class='title'>${chapterTitle}</h1>
+          ${text}
+        `),
+        {
+          allowedAttributes: {
+            a: ['href', 'name', 'target'],
+            h1: ['class'],
+            img: [
+              'src',
+              'srcset',
+              'alt',
+              'title',
+              'width',
+              'height',
+              'loading',
+            ],
           },
-        ),
+          allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img']),
+          exclusiveFilter: (frame) => {
+            const { tag, attribs } = frame;
+            if (tag === 'img') {
+              return !attribs['src'];
+            }
+            return false;
+          },
+          nonBooleanAttributes: ['*'],
+        },
+      );
+      sections.push({
+        content,
         title: chapterTitle,
       });
     }
