@@ -10,6 +10,9 @@
 - Rename `transformContent` -> `transformChapter` to better fit what it does
 - Update to new `sanitize-html` for empty attributes to be removed
 - Remove empty image tags
+- Xenforo now adds `<p>` tags around lines
+- Remove zero-width whitespace characters
+- base64 download for images
 
 ## 2023-07-04 - v0.0.8
 - Publish with types

@@ -11,7 +11,7 @@ const loadImage = async (img: Element): Promise<string | null> => {
   try {
     const url = new URL(src);
     const srcSplit = src.split('/');
-    const end = srcSplit.length > 0 ? srcSplit[srcSplit.length - 1] : null;
+    const end = srcSplit.length > 0 ? srcSplit.at(-1) : null;
     if (end) {
       const split = getCachePath(url).split(sep);
       const filename = split[split.length - 1];

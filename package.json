@@ -16,6 +16,7 @@
     "got": "^13.0.0",
     "htmlparser2": "^9.1.0",
     "md5": "^2.3.0",
+    "mime-types": "^2.1.35",
     "parse5": "^7.1.2",
     "sanitize-html": "^2.11.0"
   },
@@ -30,6 +31,7 @@
     "@types/defaults": "^1.0.6",
     "@types/jest": "^29.5.12",
     "@types/md5": "^2.3.5",
+    "@types/mime-types": "^2.1.4",
     "@types/node": "^20.11.16",
     "@types/sanitize-html": "^2.11.0",
     "@typescript-eslint/eslint-plugin": "^6.20.0",

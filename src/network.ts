@@ -1,6 +1,7 @@
 import defaults from 'defaults';
 import md5 from 'md5';
-import { access, readFile } from 'node:fs/promises';
+import mime from 'mime-types';
+import { access, readFile, writeFile } from 'node:fs/promises';
 import { constants } from 'node:fs';
 import { exec as execSync } from 'node:child_process';
 import { extname, join } from 'node:path';
@@ -28,8 +29,18 @@ const setCookie = (_cookie: string) => {
 };
 
 const getCachePath = (url: URL) => {
-  const { href, pathname } = url;
-  const filename = `${md5(href)}${extname(pathname)}`;
+  const { href, pathname, protocol } = url;
+  let ext = extname(pathname);
+  if (protocol === 'data:') {
+    const split = pathname.split(';');
+    if (split.length > 0) {
+      const newExt = mime.extension(split[0]);
+      if (newExt) {
+        ext = `.${newExt}`;
+      }
+    }
+  }
+  const filename = `${md5(href)}${ext}`;
   return join(cachePath, filename);
 };
 
@@ -37,7 +48,7 @@ const getCache = async (file: string) => {
   try {
     await access(file, constants.R_OK);
     return String(await readFile(file));
-  } catch {
+  } catch (e) {
     // Skip
   }
   return '';
@@ -62,16 +73,28 @@ const curl = async (
     _options || {},
     defaultCurlOptions,
   );
+  const { href } = url;
   const cacheFile = getCachePath(url);
   if (options.cache && cache) {
     const cached = await getCache(cacheFile);
     if (cached !== '') {
-      debug(`Cache hit for ${url.href} at ${cacheFile}`);
+      debug(`Cache hit for ${href} at ${cacheFile}`);
       return [cached, cacheFile];
     }
-    debug(`Cache miss for ${url.href}`);
+    debug(`Cache miss for ${href}`);
   } else {
-    debug(`Skip cache for ${url.href}`);
+    debug(`Skip cache for ${href}`);
+  }
+
+  if (url.protocol === 'data:') {
+    const matched = url.pathname.match(/^.*?;base64,(.*)$/);
+    if (!matched || matched.length !== 2) {
+      return ['', cacheFile];
+    }
+    const data = Buffer.from(matched[1], 'base64');
+    writeFile(cacheFile, data);
+    debug(`Decoded base64 for ${href}`);
+    return [String(data), cacheFile];
   }
 
   const cmd = `${curlPath} -A '${agent}'${

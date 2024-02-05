@@ -1,4 +1,5 @@
-import type { AnyNode, Cheerio, CheerioAPI } from 'cheerio';
+import type { AnyNode, Cheerio, CheerioAPI, Element } from 'cheerio';
+import { ElementType } from 'htmlparser2';
 
 import loadHtml from '../utils/loadHtml.js';
 import { Chapter, Site } from './site.js';
@@ -7,6 +8,17 @@ import { error } from '../utils/log.js';
 const hasData = (o: unknown): o is { data: string } =>
   Object.hasOwnProperty.call(o, 'data') &&
   typeof (o as { data: unknown }).data === 'string';
+
+const getThreadmarkUrl = (url: URL): URL => {
+  const threadmarkUrl = new URL(String(url));
+  threadmarkUrl.hash = '';
+  threadmarkUrl.search = '';
+  const { pathname } = threadmarkUrl;
+  if (!pathname.endsWith('/threadmarks')) {
+    threadmarkUrl.pathname = `${pathname}/threadmarks`;
+  }
+  return threadmarkUrl;
+};
 
 class Xenforo extends Site {
   override matcher = /^(forums.spacebattles.com)/;
@@ -26,7 +38,7 @@ class Xenforo extends Site {
   }
 
   async getFic() {
-    let chapter = await this.getIndex(this.url);
+    let chapter = await this.getIndex(getThreadmarkUrl(this.url));
     if (chapter === null) {
       error(`Chapter: ${this.url.href} is null`);
       return null;
@@ -108,28 +120,51 @@ class Xenforo extends Site {
     const $content = await this.transformImages(
       this.transformContent(
         this.transformChapter($chapter)(
-          `[data-content="${url.hash.slice(1)}"] article.message-body`,
+          `[data-content="${url.hash.slice(1)}"] article.message-body .bbWrapper`,
         ),
       ),
     );
+
     const title = $chapter(
       `[data-content="${url.hash.slice(1)}"] .threadmarkLabel`,
     )
       .text()
       .trim();
 
-    // TODO: I don't know if I like this?
-    // Idea: Compare a story that's on both SB and RR
-    // const text =
-    //   $content
-    //     .html()
-    //     ?.split('\n')
-    //     .map((line) => line.trim())
-    //     .filter(Boolean)
-    //     .map((line) => `<p>${line}</p>`)
-    //     .join('\n') || null;
+    const convertToP = (element: AnyNode, depth = 0) => {
+      // Just in case, but unlikely to be hit
+      if (depth > 99) {
+        return;
+      }
 
-    const text = $content.html();
+      if (element.type === ElementType.Text) {
+        const { data } = element;
+        const $element = $content.find(element as unknown as Element);
+        if (data.match(/^[\n\t\s]*$/) === null) {
+          const { parent } = element;
+          if (parent?.type === ElementType.Tag) {
+            const parentName = parent.name.toLowerCase();
+            if (!['a', 'b', 'em', 'i'].includes(parentName)) {
+              $element.replaceWith(`<p>${data.trim()}</p>`);
+            }
+          }
+        }
+      }
+
+      if (element.type === ElementType.Tag) {
+        element.children.forEach((el) => convertToP(el, depth + 1));
+      }
+    };
+
+    $content.each((_, el) => convertToP(el, 0));
+
+    const text =
+      $content
+        .html()
+        ?.split('\n')
+        .map((line) => line.trim())
+        .filter((line) => line.length > 0)
+        .join('\n') || null;
 
     return {
       chapter: chapterNumber,
