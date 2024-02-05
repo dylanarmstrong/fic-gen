@@ -13,6 +13,7 @@
 - Xenforo now adds `<p>` tags around lines
 - Remove zero-width whitespace characters
 - base64 download for images
+- Output epub titles are more accurate now
 
 ## 2023-07-04 - v0.0.8
 - Publish with types

@@ -109,7 +109,7 @@ class Xenforo extends Site {
 
   override getStoryTitle($chapter: CheerioAPI) {
     const title = $chapter(this.selectors.storyTitle).text().trim();
-    return title.slice(0, title.length - ' - Threadmarks'.length);
+    return title.replace(' - Threadmarks', '');
   }
 
   override async parseChapter(

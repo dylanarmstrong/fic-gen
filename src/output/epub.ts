@@ -135,7 +135,11 @@ const write = async (fic: Fic, outputPath: string) => {
     sections,
   });
 
-  const outputTitle = title.replace(/[^a-zA-Z0-9!()[\]. ]/g, ' ');
+  const outputTitle = title
+    // Possessive 's to s
+    .replace(/'s/g, 's')
+    // Non-friendly characters get replaced with spaces
+    .replace(/[^a-zA-Z0-9!()[\]. ]/g, ' ');
   log(`Writing EPUB for '${title}' to '${join(outputPath, outputTitle)}.epub'`);
 
   await epub.write(outputPath, outputTitle);
