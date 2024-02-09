@@ -28,6 +28,7 @@ const setCookie = (_cookie: string) => {
   cookie = _cookie;
 };
 
+// TODO: Should cache be split into a story / chapter
 const getCachePath = (url: URL) => {
   const { href, pathname, protocol } = url;
   let ext = extname(pathname);
@@ -88,7 +89,7 @@ const curl = async (
 
   if (url.protocol === 'data:') {
     const matched = url.pathname.match(/^.*?;base64,(.*)$/);
-    if (!matched || matched.length !== 2) {
+    if (!matched) {
       return ['', cacheFile];
     }
     const data = Buffer.from(matched[1], 'base64');

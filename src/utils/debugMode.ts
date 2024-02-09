@@ -1,3 +1,4 @@
+// TODO: Refactor all these
 let debugMode = false;
 
 const isDebugMode = () => debugMode;

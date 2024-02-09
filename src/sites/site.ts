@@ -45,6 +45,7 @@ interface ISite {
   options: string;
   publisher: string;
   url: URL;
+  log: (level: 'debug' | 'error' | 'info' | 'warn', ...msg: unknown[]) => void;
 
   selectors: {
     author: string;
@@ -60,6 +61,7 @@ interface ISite {
     url: URL,
     chapterOptions: GetChapterOptions,
   ): Promise<string | null>;
+  // TODO: getChapterList, refactor getFic to use it
   getChapterTitle($chapter: CheerioAPI): string;
   getChapterWords(content: string | null): number;
   getCover($chapter: CheerioAPI): Promise<URL | null>;
@@ -77,6 +79,7 @@ interface ISite {
     chapterNumber: number,
     url: URL,
   ): Promise<Chapter>;
+  setLogger(log: (level: 'debug' | 'error' | 'info' | 'warn', ...msg: unknown[]) => void): void;
   transformChapter($chapter: CheerioAPI): CheerioAPI;
   transformContent($content: Cheerio<AnyNode>): Cheerio<AnyNode>;
   transformImages($content: Cheerio<AnyNode>): Promise<Cheerio<AnyNode>>;
@@ -94,6 +97,7 @@ abstract class Site implements ISite {
   options = '';
   publisher = 'unknown';
   url: URL;
+  log = (_: 'debug' | 'error' | 'info' | 'warn') => {};
 
   selectors = {
     author: '.no-element',
@@ -211,6 +215,10 @@ abstract class Site implements ISite {
       url: url.href,
       words: this.getChapterWords(text),
     };
+  }
+
+  setLogger(log: (level: 'debug' | 'error' | 'info' | 'warn', ...msg: unknown[]) => void) {
+    this.log = log;
   }
 
   transformChapter($chapter: CheerioAPI) {

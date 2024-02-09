@@ -22,10 +22,9 @@
   },
   "description": "ePub output for online web fiction",
   "devDependencies": {
-    "@dylanarmstrong/eslint-config": "^0.5.2",
+    "@dylanarmstrong/eslint-config": "^0.5.4",
     "@dylanarmstrong/tsconfig": "^0.0.2",
     "@jest/globals": "^29.7.0",
-    "@types/argparse": "^2.0.14",
     "@types/css": "^0.0.37",
     "@types/decompress": "^4.2.7",
     "@types/defaults": "^1.0.6",
