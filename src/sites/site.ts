@@ -79,7 +79,12 @@ interface ISite {
     chapterNumber: number,
     url: URL,
   ): Promise<Chapter>;
-  setLogger(log: (level: 'debug' | 'error' | 'info' | 'warn', ...msg: unknown[]) => void): void;
+  setLogger(
+    log: (
+      level: 'debug' | 'error' | 'info' | 'warn',
+      ...msg: unknown[]
+    ) => void,
+  ): void;
   transformChapter($chapter: CheerioAPI): CheerioAPI;
   transformContent($content: Cheerio<AnyNode>): Cheerio<AnyNode>;
   transformImages($content: Cheerio<AnyNode>): Promise<Cheerio<AnyNode>>;
@@ -217,7 +222,12 @@ abstract class Site implements ISite {
     };
   }
 
-  setLogger(log: (level: 'debug' | 'error' | 'info' | 'warn', ...msg: unknown[]) => void) {
+  setLogger(
+    log: (
+      level: 'debug' | 'error' | 'info' | 'warn',
+      ...msg: unknown[]
+    ) => void,
+  ) {
     this.log = log;
   }
 

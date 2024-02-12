@@ -3,9 +3,7 @@
 import meow from '@dylanarmstrong/meow';
 
 import App from './app.js';
-import {
-  data as dataPath,
-} from './utils/paths.js';
+import { data as dataPath } from './utils/paths.js';
 import { error } from './utils/log.js';
 
 const cli = meow(

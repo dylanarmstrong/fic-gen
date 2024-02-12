@@ -3,17 +3,19 @@ import { access, mkdir } from 'node:fs/promises';
 import { constants } from 'node:fs';
 
 import write from './output/epub.js';
-import { 
-  cache as cachePath, 
-  curl as curlPath, 
-  curlHome as curlHomePath, 
+import {
+  cache as cachePath,
+  curl as curlPath,
+  curlHome as curlHomePath,
 } from './utils/paths.js';
+import { machine } from './machine.js';
 import { setup } from './setup.js';
 import ArchiveOfOurOwn from './sites/archiveofourown.js';
 import BoxNovel from './sites/boxnovel.js';
 import FanFiction from './sites/fanfiction.js';
 import RoyalRoad from './sites/royalroad.js';
 import Xenforo from './sites/xenforo.js';
+import { createActor } from 'xstate';
 
 type Config = Partial<{
   agent: string;
@@ -24,6 +26,14 @@ type Config = Partial<{
   outputPath: string;
   url: string;
 }>;
+
+const sites = Object.freeze([
+  ArchiveOfOurOwn,
+  BoxNovel,
+  FanFiction,
+  RoyalRoad,
+  Xenforo,
+]);
 
 const defaultConfig = {
   agent: '',
@@ -46,6 +56,15 @@ class App {
     this.config = defaults(partialConfig, defaultConfig);
     this.initialize();
     this.writeFic();
+
+    const actor = createActor(machine);
+    actor.subscribe((snapshot) => {
+      console.log('Value:', snapshot.value);
+    });
+
+    actor.start();
+
+    actor.send({ type: 'toggle' });
   }
 
   log(level: 'debug' | 'error' | 'info' | 'warn', ...msg: unknown[]) {
@@ -58,13 +77,9 @@ class App {
   async writeFic() {
     const { cookie, url } = this.config;
 
-    const site = [
-      new ArchiveOfOurOwn(url, cookie),
-      new BoxNovel(url, cookie),
-      new FanFiction(url, cookie),
-      new RoyalRoad(url, cookie),
-      new Xenforo(url, cookie),
-    ].find((_site) => _site.isValidSite());
+    const site = sites
+      .map((SpecificSite) => new SpecificSite(url, cookie))
+      .find((_site) => _site.isValidSite());
 
     if (site) {
       site.setLogger(this.log);
@@ -101,7 +116,9 @@ class App {
     try {
       await access(curlPath, constants.R_OK | constants.X_OK);
     } catch {
-      throw new Error(`curl does not exist or is not executable at ${curlPath}`);
+      throw new Error(
+        `curl does not exist or is not executable at ${curlPath}`,
+      );
     }
 
     const { outputPath } = this.config;
