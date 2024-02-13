@@ -37,7 +37,6 @@ fic-gen -c cf_clearance=123 https://www.fanfiction.net/s/12345/1/story-title
 
 * Retry for failing curl
 * What is max title length on kindle?
-* Title shouldn't have multiple spaces in row https://www.royalroad.com/fiction/65108/death-loot-vampires
 * Site Support:
     * Xenforo General
     * Fictionpress

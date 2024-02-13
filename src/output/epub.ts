@@ -10,6 +10,7 @@ import type { Fic } from '../sites/site.js';
 import type { Config, Log } from '../types.js';
 import { curl } from '../network.js';
 import { validGif, validJpg, validPng } from '../utils/small.js';
+import { getPathForEpub } from '../utils/getPathForEpub.js';
 
 const write = async (fic: Fic, config: Config, log: Log) => {
   const { outputPath } = config;
@@ -148,7 +149,7 @@ const write = async (fic: Fic, config: Config, log: Log) => {
 
       return {
         data,
-        name: image,
+        name: await getPathForEpub(image),
       };
     }),
   );
@@ -165,7 +166,9 @@ const write = async (fic: Fic, config: Config, log: Log) => {
     // Possessive 's to s
     .replace(/'s/g, 's')
     // Non-friendly characters get replaced with spaces
-    .replace(/[^a-zA-Z0-9!()[\]. ]/g, ' ');
+    .replace(/[^a-zA-Z0-9!()[\]. ]/g, ' ')
+    // Replace multiple spaces
+    .replace(/\s{2,}/g, ' ');
 
   log(
     'info',

@@ -12,6 +12,7 @@
     "css": "^3.0.0",
     "decompress": "^4.2.1",
     "defaults": "^3.0.0",
+    "file-type": "^19.0.0",
     "got": "^13.0.0",
     "htmlparser2": "^9.1.0",
     "md5": "^2.3.0",
@@ -74,5 +75,5 @@
     "test": "node --no-warnings --experimental-vm-modules ./node_modules/jest/bin/jest"
   },
   "type": "module",
-  "version": "0.1.0"
+  "version": "0.1.1"
 }

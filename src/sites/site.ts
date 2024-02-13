@@ -2,9 +2,9 @@ import defaults from 'defaults';
 import type { AnyNode, Cheerio, CheerioAPI } from 'cheerio';
 
 import loadHtml from '../utils/loadHtml.js';
-import loadImage from '../utils/loadImage.js';
 import type { Config, Log } from '../types.js';
-import { curl } from '../network.js';
+import { curl, getCachePath } from '../network.js';
+import { getPathForEpub } from '../utils/getPathForEpub.js';
 
 type Author = {
   text: string;
@@ -227,13 +227,28 @@ abstract class Site implements ISite {
   }
 
   async transformImages($content: Cheerio<AnyNode>) {
-    const ps: Promise<string | null>[] = [];
-    $content.find('img').each((_, img) => {
-      ps.push(loadImage(img, this.config, this.log));
-    });
-    await Promise.all(ps).then((imgs) =>
-      imgs.forEach((img) => img !== null && this.images.push(img)),
-    );
+    const images = $content.find('img').toArray();
+    let filepath = '';
+    for (let i = 0, len = images.length; i < len; i += 1) {
+      const img = images[i];
+      const { src } = img.attribs;
+      if (src) {
+        try {
+          const url = new URL(src);
+          const filename = await getPathForEpub(getCachePath(url));
+          if (filename) {
+            img.attribs['src'] = `../resources/${filename}`;
+            img.attribs['alt'] = img.attribs['alt'] || 'image';
+            [, filepath] = await curl(url, this.config, this.log);
+          }
+        } catch (e) {
+          // Pass
+        }
+      }
+      if (filepath) {
+        this.images.push(filepath);
+      }
+    }
     return $content;
   }
 }

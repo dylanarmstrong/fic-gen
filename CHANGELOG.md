@@ -1,4 +1,8 @@
 # CHANGE LOG
+## Unpublished
+- Use `file-type` to determine file extension when missing
+- Remove multiple spaces in title
+
 ## 2024-02-13 v0.1.0
 - Update `@dylanarmstrong/nodepub` version
 - Remove unused `uuid` dependency
