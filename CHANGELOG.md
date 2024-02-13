@@ -14,6 +14,9 @@
 - Remove zero-width whitespace characters
 - base64 download for images
 - Output epub titles are more accurate now
+- Add support for The Wandering Inn
+- Refactor into using a App class to avoid global variables
+- Resize large images to maximum resolution on Kindle Paperwhite
 
 ## 2023-07-04 - v0.0.8
 - Publish with types
