@@ -100,7 +100,7 @@ const curl = async (
 
   const cmd = `${curlPath} -A '${agent}'${
     cookie ? ` -H 'Cookie: ${cookie}'` : ''
-  } -s -o "${cacheFile}" ${options.append} -- "${url}"`;
+  } -s -o "${cacheFile}" -L ${options.append} -- "${url}"`;
 
   debug(cmd);
 

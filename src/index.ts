@@ -17,6 +17,7 @@ const cli = meow(
     * FanFiction
     * RoyalRoad
     * SpaceBattles
+    * WanderingInn
 
   Examples:
     $ fic-gen -c cf_clearance=123 https://www.fanfiction.net/s/12345/1/story-title
