@@ -1,11 +1,11 @@
 # CHANGE LOG
-## Unpublished
+## 2024-02-13 v0.1.0
 - Update `@dylanarmstrong/nodepub` version
 - Remove unused `uuid` dependency
 - Styling on chapter title and first letter of chapter
 - Add setup code to automatically download `curl-impersonate`
 - Scaffolding for tests added
-- Switch to `@dylanarmstrong/meow` from `argparse`
+- Switch to `meow` from `argparse`
 - Remove `display: none` lines from RoyalRoad
 - Rename `transformContent` -> `transformChapter` to better fit what it does
 - Update to new `sanitize-html` for empty attributes to be removed
@@ -17,6 +17,7 @@
 - Add support for The Wandering Inn
 - Refactor into using a App class to avoid global variables
 - Resize large images to maximum resolution on Kindle Paperwhite
+- Update `curl-impersonate` to `v0.6.0`
 
 ## 2023-07-04 - v0.0.8
 - Publish with types

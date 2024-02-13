@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import meow from '@dylanarmstrong/meow';
+import meow from 'meow';
 
 import App from './app.js';
 import { data as dataPath } from './utils/paths.js';

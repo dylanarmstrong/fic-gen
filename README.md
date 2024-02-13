@@ -1,6 +1,6 @@
 ## fic-gen
 
-Generate ePub when given a url.
+Generate ePub when given a url using [curl-impersonate](https://github.com/lwthiker/curl-impersonate).
 
 ## Usage
 
@@ -23,7 +23,7 @@ Generate ePub when given a url.
 * FanFiction
 * RoyalRoad
 * SpaceBattles
-* WanderingInn [**Unpublished**]
+* WanderingInn
 
 ## FanFiction
 

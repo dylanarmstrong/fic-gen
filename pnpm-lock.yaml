@@ -5,9 +5,6 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
-  '@dylanarmstrong/meow':
-    specifier: ^12.1.2
-    version: 12.1.2
   '@dylanarmstrong/nodepub':
     specifier: ^4.1.5
     version: 4.1.5
@@ -32,6 +29,9 @@ dependencies:
   md5:
     specifier: ^2.3.0
     version: 2.3.0
+  meow:
+    specifier: ^13.2.0
+    version: 13.2.0
   mime-types:
     specifier: ^2.1.35
     version: 2.1.35
@@ -462,11 +462,6 @@ packages:
       chalk: 4.1.2
       eslint: 8.56.0
     dev: true
-
-  /@dylanarmstrong/meow@12.1.2:
-    resolution: {integrity: sha512-EeO2A8zP3Aq4S8rbO7zB7VpNwjUefD13oJ1aJyDAKo+zKLrzNlS3o/0iJE6Z+oHTOQG2a2kEjUS2rQ9Zdhxt4A==}
-    engines: {node: '>=16.10'}
-    dev: false
 
   /@dylanarmstrong/nodepub@4.1.5:
     resolution: {integrity: sha512-Kl8BW1uoh3jEMOnAbrXLz5QNua2NLm8OZOGJgPMkeZM/JIgfKI+rFpNz/uKuOowab6zyLuOUO2aDuE0W+9qEfA==}
@@ -3769,6 +3764,11 @@ packages:
       charenc: 0.0.2
       crypt: 0.0.2
       is-buffer: 1.1.6
+    dev: false
+
+  /meow@13.2.0:
+    resolution: {integrity: sha512-pxQJQzB6djGPXh08dacEloMFopsOqGVRKFPYvPOt9XDZ1HasbgDZA74CJGreSU4G3Ak7EFJGoiH2auq+yXISgA==}
+    engines: {node: '>=18'}
     dev: false
 
   /merge-stream@2.0.0:

@@ -43,7 +43,7 @@ const setup = async (log: Log): Promise<void> => {
     throw new Error('process.arch is not valid for curl-impersonate');
   }
 
-  const version = 'v0.5.4';
+  const version = 'v0.6.0';
   const url = `https://github.com/lwthiker/curl-impersonate/releases/download/${version}/curl-impersonate-${version}.${arch}-${platform}.tar.gz`;
   const destName = join(os.tmpdir(), 'curl.tar.gz');
   log('debug', `Downloading ${url} to ${destName}`);
