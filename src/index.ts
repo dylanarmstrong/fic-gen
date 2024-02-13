@@ -4,7 +4,6 @@ import meow from '@dylanarmstrong/meow';
 
 import App from './app.js';
 import { data as dataPath } from './utils/paths.js';
-import { error } from './utils/log.js';
 
 const cli = meow(
   `
@@ -108,7 +107,8 @@ if (version) {
 }
 
 if (!url) {
-  error('Please add the URL that you are trying to retrieve.');
+  // eslint-disable-next-line no-console
+  console.error('Please add the URL that you are trying to retrieve.');
   cli.showHelp();
 }
 

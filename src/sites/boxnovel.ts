@@ -3,7 +3,6 @@ import type { CheerioAPI } from 'cheerio';
 import loadHtml from '../utils/loadHtml.js';
 import { Chapter, Site } from './site.js';
 import { curl } from '../network.js';
-import { error } from '../utils/log.js';
 
 const hasData = (o: unknown): o is { data: string } =>
   Object.hasOwnProperty.call(o, 'data') &&
@@ -22,25 +21,21 @@ class BoxNovel extends Site {
     storyTitle: '.post-title',
   };
 
-  constructor(url: string, cookie?: string) {
-    super(url, cookie);
-  }
-
   async getFic() {
     let chapter = await this.getIndex(this.url);
     if (chapter === null) {
-      error(`Chapter: ${this.url.href} is null`);
+      this.log('error', `Chapter: ${this.url.href} is null`);
       return null;
     }
 
     let $chapter = loadHtml(chapter);
     const chapterUrl = new URL(`${this.url.href}ajax/chapters/`);
-    const [chaptersXhr] = await curl(chapterUrl, {
+    const [chaptersXhr] = await curl(chapterUrl, this.config, this.log, {
       append: `-H "Referer: ${this.url.href}" -H "X-Requested-With: XMLHttpRequest" -X POST`,
       cache: false,
     });
     if (chaptersXhr === null) {
-      error(`Cannot get chapters list from ${chapterUrl.href}`);
+      this.log('error', `Cannot get chapters list from ${chapterUrl.href}`);
       return null;
     }
     const $chapters = loadHtml(chaptersXhr);
@@ -72,7 +67,7 @@ class BoxNovel extends Site {
       const next = new URL(chapters[i].url);
       chapter = await this.getChapter(next);
       if (chapter === null) {
-        error(`Chapter: ${next.href} is null`);
+        this.log('error', `Chapter: ${next.href} is null`);
       } else {
         $chapter = loadHtml(chapter);
         const parsedChapter = await this.parseChapter($chapter, i + 1, next);

@@ -7,11 +7,12 @@ import { readFile } from 'node:fs/promises';
 
 import normalizeHtml from '../utils/normalizeHtml.js';
 import type { Fic } from '../sites/site.js';
+import type { Config, Log } from '../types.js';
 import { curl } from '../network.js';
-import { log } from '../utils/log.js';
 import { validGif, validJpg, validPng } from '../utils/small.js';
 
-const write = async (fic: Fic, outputPath: string) => {
+const write = async (fic: Fic, config: Config, log: Log) => {
+  const { outputPath } = config;
   const { cover, title } = fic;
   let filepath = title;
   let coverType: 'text' | 'image' = 'text';
@@ -21,7 +22,7 @@ const write = async (fic: Fic, outputPath: string) => {
   };
 
   if (cover) {
-    [, filepath] = await curl(cover);
+    [, filepath] = await curl(cover, config, log);
     coverType = 'image';
     coverData = {
       data: await readFile(filepath),
@@ -165,7 +166,11 @@ const write = async (fic: Fic, outputPath: string) => {
     .replace(/'s/g, 's')
     // Non-friendly characters get replaced with spaces
     .replace(/[^a-zA-Z0-9!()[\]. ]/g, ' ');
-  log(`Writing EPUB for '${title}' to '${join(outputPath, outputTitle)}.epub'`);
+
+  log(
+    'info',
+    `Writing EPUB for '${title}' to '${join(outputPath, outputTitle)}.epub'`,
+  );
 
   await epub.write(outputPath, outputTitle);
 };

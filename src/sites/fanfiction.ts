@@ -2,7 +2,6 @@ import type { CheerioAPI } from 'cheerio';
 
 import loadHtml from '../utils/loadHtml.js';
 import { Site } from './site.js';
-import { error } from '../utils/log.js';
 
 class FanFiction extends Site {
   override matcher = /^www.fanfiction.net/;
@@ -17,14 +16,10 @@ class FanFiction extends Site {
     storyTitle: 'b.xcontrast_txt',
   };
 
-  constructor(url: string, cookie?: string) {
-    super(url, cookie);
-  }
-
   async getFic() {
     let chapter = await this.getIndex(this.url);
     if (chapter === null) {
-      error(`Chapter: ${this.url.href} is null`);
+      this.log('error', `Chapter: ${this.url.href} is null`);
       return null;
     }
 
@@ -55,7 +50,7 @@ class FanFiction extends Site {
           const parsedChapter = await this.parseChapter($chapter, i, next);
           chapters.push(parsedChapter);
         } else {
-          error(`Chapter: ${next.href} is null`);
+          this.log('error', `Chapter: ${next.href} is null`);
         }
       }
     }

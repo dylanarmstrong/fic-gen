@@ -3,6 +3,7 @@ import type { AnyNode, Cheerio, CheerioAPI } from 'cheerio';
 
 import loadHtml from '../utils/loadHtml.js';
 import loadImage from '../utils/loadImage.js';
+import type { Config, Log } from '../types.js';
 import { curl } from '../network.js';
 
 type Author = {
@@ -39,13 +40,13 @@ type Fic = {
 };
 
 interface ISite {
-  cookie: string;
+  config: Required<Config>;
   images: string[];
+  log: Log;
   matcher: RegExp;
   options: string;
   publisher: string;
   url: URL;
-  log: (level: 'debug' | 'error' | 'info' | 'warn', ...msg: unknown[]) => void;
 
   selectors: {
     author: string;
@@ -79,12 +80,6 @@ interface ISite {
     chapterNumber: number,
     url: URL,
   ): Promise<Chapter>;
-  setLogger(
-    log: (
-      level: 'debug' | 'error' | 'info' | 'warn',
-      ...msg: unknown[]
-    ) => void,
-  ): void;
   transformChapter($chapter: CheerioAPI): CheerioAPI;
   transformContent($content: Cheerio<AnyNode>): Cheerio<AnyNode>;
   transformImages($content: Cheerio<AnyNode>): Promise<Cheerio<AnyNode>>;
@@ -96,13 +91,13 @@ const defaultChapterOptions = {
 } as const;
 
 abstract class Site implements ISite {
-  cookie = '';
+  config: Required<Config>;
   images: string[] = [];
+  log: Log;
   matcher = /not going to match/;
   options = '';
   publisher = 'unknown';
   url: URL;
-  log = (_: 'debug' | 'error' | 'info' | 'warn') => {};
 
   selectors = {
     author: '.no-element',
@@ -113,9 +108,10 @@ abstract class Site implements ISite {
     storyTitle: '.no-element',
   };
 
-  constructor(url: string, cookie = '') {
-    this.cookie = cookie;
-    this.url = new URL(url);
+  constructor(config: Required<Config>, log: Log) {
+    this.config = config;
+    this.log = log.bind(this);
+    this.url = new URL(config.url);
   }
 
   abstract getFic(): Promise<Fic | null>;
@@ -134,7 +130,7 @@ abstract class Site implements ISite {
       defaultChapterOptions,
     );
 
-    const [chapter] = await curl(url, {
+    const [chapter] = await curl(url, this.config, this.log, {
       append: this.options,
       cache: checkCache,
     });
@@ -222,15 +218,6 @@ abstract class Site implements ISite {
     };
   }
 
-  setLogger(
-    log: (
-      level: 'debug' | 'error' | 'info' | 'warn',
-      ...msg: unknown[]
-    ) => void,
-  ) {
-    this.log = log;
-  }
-
   transformChapter($chapter: CheerioAPI) {
     return $chapter;
   }
@@ -242,7 +229,7 @@ abstract class Site implements ISite {
   async transformImages($content: Cheerio<AnyNode>) {
     const ps: Promise<string | null>[] = [];
     $content.find('img').each((_, img) => {
-      ps.push(loadImage(img));
+      ps.push(loadImage(img, this.config, this.log));
     });
     await Promise.all(ps).then((imgs) =>
       imgs.forEach((img) => img !== null && this.images.push(img)),

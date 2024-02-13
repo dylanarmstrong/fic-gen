@@ -7,26 +7,10 @@ import { exec as execSync } from 'node:child_process';
 import { extname, join } from 'node:path';
 import { promisify } from 'node:util';
 
+import type { Config, Log } from './types.js';
 import { cache as cachePath, curl as curlPath } from './utils/paths.js';
-import { debug, error } from './utils/log.js';
 
 const exec = promisify(execSync);
-
-let agent = '';
-let cache = true;
-let cookie = '';
-
-const setCache = (_cache: boolean) => {
-  cache = _cache;
-};
-
-const setAgent = (_agent: string) => {
-  agent = _agent;
-};
-
-const setCookie = (_cookie: string) => {
-  cookie = _cookie;
-};
 
 // TODO: Should cache be split into a story / chapter
 const getCachePath = (url: URL) => {
@@ -68,23 +52,28 @@ const defaultCurlOptions: Required<CurlOptions> = {
 // cookie is the cf_clearance cookie
 const curl = async (
   url: URL,
+  config: Config,
+  log: Log,
   _options?: CurlOptions,
 ): Promise<[string, string]> => {
+  const { agent, cache, cookie } = config;
+
   const options: Required<CurlOptions> = defaults(
     _options || {},
     defaultCurlOptions,
   );
+
   const { href } = url;
   const cacheFile = getCachePath(url);
   if (options.cache && cache) {
     const cached = await getCache(cacheFile);
     if (cached !== '') {
-      debug(`Cache hit for ${href} at ${cacheFile}`);
+      log('debug', `Cache hit for ${href} at ${cacheFile}`);
       return [cached, cacheFile];
     }
-    debug(`Cache miss for ${href}`);
+    log('debug', `Cache miss for ${href}`);
   } else {
-    debug(`Skip cache for ${href}`);
+    log('debug', `Skip cache for ${href}`);
   }
 
   if (url.protocol === 'data:') {
@@ -94,7 +83,7 @@ const curl = async (
     }
     const data = Buffer.from(matched[1], 'base64');
     writeFile(cacheFile, data);
-    debug(`Decoded base64 for ${href}`);
+    log('debug', `Decoded base64 for ${href}`);
     return [String(data), cacheFile];
   }
 
@@ -102,14 +91,14 @@ const curl = async (
     cookie ? ` -H 'Cookie: ${cookie}'` : ''
   } -s -o "${cacheFile}" -L ${options.append} -- "${url}"`;
 
-  debug(cmd);
+  log('debug', cmd);
 
   const { stderr } = await exec(cmd);
   if (stderr) {
-    error(stderr);
+    log('error', stderr);
   }
 
   return [await getCache(cacheFile), cacheFile];
 };
 
-export { curl, getCachePath, setAgent, setCache, setCookie };
+export { curl, getCachePath };

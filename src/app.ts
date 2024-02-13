@@ -8,30 +8,21 @@ import {
   curl as curlPath,
   curlHome as curlHomePath,
 } from './utils/paths.js';
-import { machine } from './machine.js';
-import { setup } from './setup.js';
 import ArchiveOfOurOwn from './sites/archiveofourown.js';
 import BoxNovel from './sites/boxnovel.js';
 import FanFiction from './sites/fanfiction.js';
 import RoyalRoad from './sites/royalroad.js';
+import WanderingInn from './sites/wanderinginn.js';
 import Xenforo from './sites/xenforo.js';
-import { createActor } from 'xstate';
-
-type Config = Partial<{
-  agent: string;
-  cache: boolean;
-  cookie: string;
-  debugMode: boolean;
-  initialize: boolean;
-  outputPath: string;
-  url: string;
-}>;
+import type { Config } from './types.js';
+import { setup } from './setup.js';
 
 const sites = Object.freeze([
   ArchiveOfOurOwn,
   BoxNovel,
   FanFiction,
   RoyalRoad,
+  WanderingInn,
   Xenforo,
 ]);
 
@@ -52,40 +43,30 @@ const hasCode = (e: unknown): e is { code: string } =>
 class App {
   config: Required<Config>;
 
-  constructor(partialConfig: Config) {
+  constructor(partialConfig: Partial<Config>) {
     this.config = defaults(partialConfig, defaultConfig);
     this.initialize();
     this.writeFic();
 
-    const actor = createActor(machine);
-    actor.subscribe((snapshot) => {
-      console.log('Value:', snapshot.value);
-    });
-
-    actor.start();
-
-    actor.send({ type: 'toggle' });
+    this.log = this.log.bind(this);
   }
 
   log(level: 'debug' | 'error' | 'info' | 'warn', ...msg: unknown[]) {
     if (level !== 'debug' || (level === 'debug' && this.config.debugMode)) {
       // eslint-disable-next-line no-console
-      console[level](msg);
+      console[level](...msg);
     }
   }
 
   async writeFic() {
-    const { cookie, url } = this.config;
-
     const site = sites
-      .map((SpecificSite) => new SpecificSite(url, cookie))
+      .map((SpecificSite) => new SpecificSite(this.config, this.log))
       .find((_site) => _site.isValidSite());
 
     if (site) {
-      site.setLogger(this.log);
       const fic = await site.getFic();
       if (fic) {
-        await write(fic, this.config.outputPath);
+        await write(fic, this.config, this.log);
       }
     }
   }
@@ -110,7 +91,7 @@ class App {
         }
       }
       this.log('info', `Downloading curl-impersonate to ${curlHomePath}`);
-      await setup();
+      await setup(this.log);
     }
 
     try {

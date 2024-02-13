@@ -5,7 +5,6 @@ import type { CheerioAPI } from 'cheerio';
 
 import loadHtml from '../utils/loadHtml.js';
 import { Chapter, Site } from './site.js';
-import { error } from '../utils/log.js';
 
 class WanderingInn extends Site {
   override matcher = /^wanderinginn.com/;
@@ -20,16 +19,12 @@ class WanderingInn extends Site {
     storyTitle: '.no-element',
   };
 
-  constructor(url: string, cookie?: string) {
-    super(url, cookie);
-  }
-
   async getFic() {
     let chapter = await this.getIndex(
       new URL('https://wanderinginn.com/table-of-contents/'),
     );
     if (chapter === null) {
-      error(`Chapter: ${this.url.href} is null`);
+      this.log('error', `Chapter: ${this.url.href} is null`);
       return null;
     }
 
@@ -53,7 +48,7 @@ class WanderingInn extends Site {
       }
 
       if (chapter === null) {
-        error(`Chapter: ${next.href} is null`);
+        this.log('error', `Chapter: ${next.href} is null`);
       } else {
         $chapter = loadHtml(chapter);
         const parsedChapter = await this.parseChapter($chapter, i + 1, next);

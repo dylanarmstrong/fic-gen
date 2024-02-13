@@ -28,8 +28,4 @@ const validPng = Object.freeze([
   0x60, 0x82,
 ]);
 
-export {
-  validGif,
-  validJpg,
-  validPng,
-};
+export { validGif, validJpg, validPng };

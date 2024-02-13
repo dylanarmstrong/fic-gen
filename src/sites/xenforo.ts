@@ -3,7 +3,6 @@ import { ElementType } from 'htmlparser2';
 
 import loadHtml from '../utils/loadHtml.js';
 import { Chapter, Site } from './site.js';
-import { error } from '../utils/log.js';
 
 const hasData = (o: unknown): o is { data: string } =>
   Object.hasOwnProperty.call(o, 'data') &&
@@ -33,14 +32,10 @@ class Xenforo extends Site {
     storyTitle: 'h1.p-title-value',
   };
 
-  constructor(url: string, cookie?: string) {
-    super(url, cookie);
-  }
-
   async getFic() {
     let chapter = await this.getIndex(getThreadmarkUrl(this.url));
     if (chapter === null) {
-      error(`Chapter: ${this.url.href} is null`);
+      this.log('error', `Chapter: ${this.url.href} is null`);
       return null;
     }
 
@@ -75,7 +70,7 @@ class Xenforo extends Site {
       const next = new URL(chapters[i].url);
       chapter = await this.getChapter(new URL(next.href.replace('%23', '#')));
       if (chapter === null) {
-        error(`Chapter: ${next.href} is null`);
+        this.log('error', `Chapter: ${next.href} is null`);
       } else {
         $chapter = loadHtml(chapter);
         const parsedChapter = await this.parseChapter($chapter, i + 1, next);

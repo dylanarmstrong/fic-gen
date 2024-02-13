@@ -1,8 +1,8 @@
 import type { AnyNode, Cheerio, CheerioAPI } from 'cheerio';
 
 import loadHtml from '../utils/loadHtml.js';
+import type { Config, Log } from '../types.js';
 import { Site } from './site.js';
-import { error } from '../utils/log.js';
 
 class ArchiveOfOurOwn extends Site {
   override matcher = /^archiveofourown.org/;
@@ -17,14 +17,14 @@ class ArchiveOfOurOwn extends Site {
     storyTitle: 'h2.title',
   };
 
-  constructor(url: string, cookie?: string) {
-    super(url, cookie);
+  constructor(config: Config, log: Log) {
+    super(config, log);
   }
 
   async getFic() {
     let chapter = await this.getChapter(this.url);
     if (chapter === null) {
-      error(`Chapter: ${this.url.href} is null`);
+      this.log('error', `Chapter: ${this.url.href} is null`);
       return null;
     }
 
@@ -45,7 +45,7 @@ class ArchiveOfOurOwn extends Site {
         next.pathname = nextChapter;
         chapter = await this.getChapter(next);
         if (chapter === null) {
-          error(`Chapter: ${next.href} is null`);
+          this.log('error', `Chapter: ${next.href} is null`);
         } else {
           $chapter = loadHtml(chapter);
           chapters.push(await this.parseChapter($chapter, i, next));

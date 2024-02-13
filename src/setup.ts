@@ -5,8 +5,8 @@ import { got } from 'got';
 import { join } from 'node:path';
 import { pipeline } from 'node:stream/promises';
 
+import type { Log } from './types.js';
 import { curlHome as curlHomePath } from './utils/paths.js';
-import { debug } from './utils/log.js';
 
 const getPlatform = (): string | null => {
   const { platform } = process;
@@ -32,7 +32,7 @@ const getArch = (): string | null => {
   }
 };
 
-const setup = async (): Promise<void> => {
+const setup = async (log: Log): Promise<void> => {
   const platform = getPlatform();
   const arch = getArch();
   if (platform === null) {
@@ -46,7 +46,7 @@ const setup = async (): Promise<void> => {
   const version = 'v0.5.4';
   const url = `https://github.com/lwthiker/curl-impersonate/releases/download/${version}/curl-impersonate-${version}.${arch}-${platform}.tar.gz`;
   const destName = join(os.tmpdir(), 'curl.tar.gz');
-  debug(`Downloading ${url} to ${destName}`);
+  log('debug', `Downloading ${url} to ${destName}`);
   await pipeline(got.stream(url), createWriteStream(destName));
   await decompress(destName, curlHomePath);
 };
