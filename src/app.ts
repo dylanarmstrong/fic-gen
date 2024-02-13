@@ -45,10 +45,9 @@ class App {
 
   constructor(partialConfig: Partial<Config>) {
     this.config = defaults(partialConfig, defaultConfig);
-    this.initialize();
-    this.writeFic();
-
     this.log = this.log.bind(this);
+
+    this.initialize().then(() => this.writeFic());
   }
 
   log(level: 'debug' | 'error' | 'info' | 'warn', ...msg: unknown[]) {
