@@ -23,6 +23,7 @@ Generate ePub when given a url.
 * FanFiction
 * RoyalRoad
 * SpaceBattles
+* WanderingInn
 
 ## FanFiction
 
@@ -42,6 +43,4 @@ fic-gen -c cf_clearance=123 https://www.fanfiction.net/s/12345/1/story-title
     * Fictionpress
 * Royalroad: Support custom style <hr> tags: https://www.royalroad.com/fiction/58643/tenebroum/chapter/992389/ch-01-blood-money
 * Tests
-* Base64 images: https://forums.spacebattles.com/threads/easy-mode-gamer-multicross-si.491065/threadmarks
 * Maybe support for using `got` instead of `curl` on non-ff
-* Xenforo styling is off

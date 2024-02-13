@@ -7,6 +7,7 @@ import { constants } from 'node:fs';
 import ArchiveOfOurOwn from './sites/archiveofourown.js';
 import BoxNovel from './sites/boxnovel.js';
 import FanFiction from './sites/fanfiction.js';
+import WanderingInn from './sites/wanderinginn.js';
 import RoyalRoad from './sites/royalroad.js';
 import Xenforo from './sites/xenforo.js';
 import {
@@ -32,6 +33,7 @@ const cli = meow(
     * FanFiction
     * RoyalRoad
     * SpaceBattles
+    * WanderingInn
 
   Examples:
     $ fic-gen -c cf_clearance=123 https://www.fanfiction.net/s/12345/1/story-title
@@ -189,6 +191,7 @@ const hasCode = (e: unknown): e is { code: string } =>
     new FanFiction(url, cookie),
     new RoyalRoad(url, cookie),
     new Xenforo(url, cookie),
+    new WanderingInn(url, cookie),
   ].find((_site) => _site.isValidSite());
 
   if (site) {
