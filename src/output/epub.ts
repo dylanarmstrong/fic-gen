@@ -1,5 +1,6 @@
 import Epub from '@dylanarmstrong/nodepub';
 import sanitizeHtml from 'sanitize-html';
+import sharp from 'sharp';
 import type { Resource, Section } from '@dylanarmstrong/nodepub';
 import { extname, join } from 'node:path';
 import { readFile } from 'node:fs/promises';
@@ -8,13 +9,14 @@ import normalizeHtml from '../utils/normalizeHtml.js';
 import type { Fic } from '../sites/site.js';
 import { curl } from '../network.js';
 import { log } from '../utils/log.js';
+import { validGif, validJpg, validPng } from '../utils/small.js';
 
 const write = async (fic: Fic, outputPath: string) => {
   const { cover, title } = fic;
   let filepath = title;
   let coverType: 'text' | 'image' = 'text';
   let coverData: Resource = {
-    data: Buffer.from([0]),
+    data: Buffer.from(validJpg),
     name: 'cover.jpg',
   };
 
@@ -121,10 +123,33 @@ const write = async (fic: Fic, outputPath: string) => {
   };
 
   const resources = await Promise.all(
-    fic.images.map(async (image) => ({
-      data: await readFile(image),
-      name: image,
-    })),
+    fic.images.map(async (image) => {
+      const data = await readFile(image)
+        .then((buffer) =>
+          sharp(buffer)
+            .resize(1236, 1648, {
+              fit: sharp.fit.inside,
+              withoutEnlargement: true,
+            })
+            .toBuffer(),
+        )
+        .catch(() => {
+          switch (extname(image)) {
+            case '.gif':
+              return Buffer.from(validGif);
+            case '.png':
+              return Buffer.from(validPng);
+            case '.jpg':
+            default:
+              return Buffer.from(validJpg);
+          }
+        });
+
+      return {
+        data,
+        name: image,
+      };
+    }),
   );
 
   const epub = new Epub({

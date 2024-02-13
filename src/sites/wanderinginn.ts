@@ -1,3 +1,6 @@
+// Notice: this works, but I've noticed a couple of chapters that result in timeouts
+// So my current solution is just to go to wayback machine and manually place them
+// in the cache folder
 import type { CheerioAPI } from 'cheerio';
 
 import loadHtml from '../utils/loadHtml.js';
@@ -22,7 +25,9 @@ class WanderingInn extends Site {
   }
 
   async getFic() {
-    let chapter = await this.getIndex(new URL('https://wanderinginn.com/table-of-contents/'));
+    let chapter = await this.getIndex(
+      new URL('https://wanderinginn.com/table-of-contents/'),
+    );
     if (chapter === null) {
       error(`Chapter: ${this.url.href} is null`);
       return null;
@@ -42,6 +47,11 @@ class WanderingInn extends Site {
     for (let i = 0, len = els.length; i < len; i += 1) {
       const next = new URL(els[i].attribs['href']);
       chapter = await this.getChapter(next);
+      if (chapter === null) {
+        // Try one more time to get without cache
+        chapter = await this.getChapter(next, { checkCache: false });
+      }
+
       if (chapter === null) {
         error(`Chapter: ${next.href} is null`);
       } else {
@@ -122,7 +132,7 @@ She’s an [Innkeeper].`;
     });
 
     // If you want images, it will result in a 3.4gb epub file
-    $chapter('img').remove();
+    // $chapter('img').remove();
 
     return $chapter;
   }
