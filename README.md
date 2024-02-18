@@ -40,6 +40,7 @@ fic-gen -c cf_clearance=123 https://www.fanfiction.net/s/12345/1/story-title
 * Site Support:
     * Xenforo General
     * Fictionpress
-* Royalroad: Support custom style \<hr\> tags: https://www.royalroad.com/fiction/58643/tenebroum/chapter/992389/ch-01-blood-money
 * Tests
 * Maybe support for using `got` instead of `curl` on non-ff
+* Add status progress bar for non-debug output
+* Maybe add a call to epubcheck if available after writing output

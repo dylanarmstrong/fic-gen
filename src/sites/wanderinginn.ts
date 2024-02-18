@@ -100,6 +100,15 @@ She’s an [Innkeeper].`;
     return 'The Wandering Inn';
   }
 
+  override isValidChapter(chapter: string) {
+    const html = loadHtml(chapter);
+    // Patreon only chapter
+    return (
+      html(this.selectors.chapter).length > 0 &&
+      html(`${this.selectors.chapter} form[method='post']`).length === 0
+    );
+  }
+
   override transformChapter($chapter: CheerioAPI): CheerioAPI {
     $chapter('a img').each((_, el) => {
       delete el.attribs['srcset'];
