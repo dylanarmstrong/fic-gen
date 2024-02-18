@@ -83,4 +83,4 @@ class ArchiveOfOurOwn extends Site {
   }
 }
 
-export default ArchiveOfOurOwn;
+export { ArchiveOfOurOwn };

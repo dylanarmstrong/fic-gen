@@ -133,4 +133,4 @@ She’s an [Innkeeper].`;
   }
 }
 
-export default WanderingInn;
+export { WanderingInn };

@@ -176,4 +176,4 @@ class Xenforo extends Site {
   }
 }
 
-export default Xenforo;
+export { Xenforo };

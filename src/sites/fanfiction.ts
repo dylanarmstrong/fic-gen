@@ -93,4 +93,4 @@ class FanFiction extends Site {
   }
 }
 
-export default FanFiction;
+export { FanFiction };

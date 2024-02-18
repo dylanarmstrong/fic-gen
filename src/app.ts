@@ -2,19 +2,19 @@ import defaults from 'defaults';
 import { access, mkdir } from 'node:fs/promises';
 import { constants } from 'node:fs';
 
+import type { Config } from './types.js';
 import write from './output/epub.js';
+import { ArchiveOfOurOwn } from './sites/archiveofourown.js';
+import { BoxNovel } from './sites/boxnovel.js';
+import { FanFiction } from './sites/fanfiction.js';
+import { RoyalRoad } from './sites/royalroad.js';
+import { WanderingInn } from './sites/wanderinginn.js';
+import { Xenforo } from './sites/xenforo.js';
 import {
   cache as cachePath,
   curl as curlPath,
   curlHome as curlHomePath,
 } from './utils/paths.js';
-import ArchiveOfOurOwn from './sites/archiveofourown.js';
-import BoxNovel from './sites/boxnovel.js';
-import FanFiction from './sites/fanfiction.js';
-import RoyalRoad from './sites/royalroad.js';
-import WanderingInn from './sites/wanderinginn.js';
-import Xenforo from './sites/xenforo.js';
-import type { Config } from './types.js';
 import { setup } from './setup.js';
 
 const sites = Object.freeze([

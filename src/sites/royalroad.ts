@@ -157,4 +157,4 @@ class RoyalRoad extends Site {
   }
 }
 
-export default RoyalRoad;
+export { RoyalRoad };

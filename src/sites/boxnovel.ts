@@ -105,4 +105,4 @@ class BoxNovel extends Site {
   }
 }
 
-export default BoxNovel;
+export { BoxNovel };
