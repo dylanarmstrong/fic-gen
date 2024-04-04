@@ -76,5 +76,5 @@
     "test": "node --no-warnings --experimental-vm-modules ./node_modules/jest/bin/jest"
   },
   "type": "module",
-  "version": "0.1.1"
+  "version": "0.2.0"
 }

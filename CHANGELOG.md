@@ -2,6 +2,8 @@
 
 ## Unpublished
 
+## 2024-04-04 v0.2.0
+
 - Use `file-type` to determine file extension when missing
 - Remove multiple spaces in title
 - Remove default exports on sites
