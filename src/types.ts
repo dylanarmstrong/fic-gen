@@ -5,6 +5,7 @@ type Config = {
   debugMode: boolean;
   initialize: boolean;
   outputPath: string;
+  setup: boolean;
   url: string;
 };
 

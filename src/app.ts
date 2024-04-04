@@ -81,6 +81,13 @@ class App {
       initialize = true;
     }
 
+    // Don't download without user explicitly okaying it
+    if (initialize && !this.config.setup) {
+      throw new Error(
+        `Please run with --setup to automatically download the latest release from 'https://github.com/lwthiker/curl-impersonate/releases' to '${curlHomePath}'`,
+      );
+    }
+
     if (initialize) {
       try {
         await mkdir(curlHomePath);
@@ -88,7 +95,7 @@ class App {
         // If directory already exists, that's fine
         if ((hasCode(error) && error.code !== 'EEXIST') || !hasCode(error)) {
           throw new Error(
-            `Unable to create curl-impersonate directory at ${curlHomePath}`,
+            `Unable to create curl-impersonate directory at '${curlHomePath}'`,
           );
         }
       }
@@ -100,7 +107,7 @@ class App {
       await access(curlPath, constants.R_OK | constants.X_OK);
     } catch {
       throw new Error(
-        `curl does not exist or is not executable at ${curlPath}`,
+        `curl does not exist or is not executable at '${curlPath}'`,
       );
     }
 
@@ -112,7 +119,7 @@ class App {
         await mkdir(outputPath);
       }
     } catch {
-      throw new Error(`Cannot make data directory at ${outputPath}`);
+      throw new Error(`Cannot make data directory at '${outputPath}'`);
     }
 
     try {
@@ -122,7 +129,7 @@ class App {
         await mkdir(cachePath);
       }
     } catch {
-      throw new Error(`Cannot make cache directory at ${cachePath}`);
+      throw new Error(`Cannot make cache directory at '${cachePath}'`);
     }
   }
 }

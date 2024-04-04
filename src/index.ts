@@ -75,6 +75,11 @@ const cli = meow(
         shortFlag: 'o',
         type: 'string',
       },
+      setup: {
+        default: false,
+        shortFlag: 's',
+        type: 'boolean',
+      },
       version: {
         default: false,
         shortFlag: 'v',
@@ -95,6 +100,7 @@ const {
   debug,
   help,
   output: outputPath,
+  setup,
   version,
 } = flags;
 const { initialize } = flags;
@@ -120,5 +126,6 @@ new App({
   debugMode: debug,
   initialize,
   outputPath,
+  setup,
   url,
 });

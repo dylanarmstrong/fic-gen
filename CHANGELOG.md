@@ -7,6 +7,7 @@
 - Add support for `WeTriedLtd`
 - Update dependencies
 - Add `eslint-plugin-unicorn`
+- Move initial setup behind --setup flag, to allow user to manually install
 
 ## 2024-02-13 v0.1.0
 - Update `@dylanarmstrong/nodepub` version
