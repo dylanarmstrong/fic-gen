@@ -4,6 +4,7 @@
 - Remove multiple spaces in title
 - Remove default exports on sites
 - Fix Wandering Inn valid chapter check to detect patreon only chapters
+- Add support for `WeTriedLtd`
 
 ## 2024-02-13 v0.1.0
 - Update `@dylanarmstrong/nodepub` version

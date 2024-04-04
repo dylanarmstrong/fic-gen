@@ -24,6 +24,7 @@ Generate ePub when given a url using [curl-impersonate](https://github.com/lwthi
 * RoyalRoad
 * SpaceBattles
 * WanderingInn
+* WeTried
 
 ## FanFiction
 

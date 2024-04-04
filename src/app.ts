@@ -9,6 +9,7 @@ import { BoxNovel } from './sites/boxnovel.js';
 import { FanFiction } from './sites/fanfiction.js';
 import { RoyalRoad } from './sites/royalroad.js';
 import { WanderingInn } from './sites/wanderinginn.js';
+import { WeTried } from './sites/wetried.js';
 import { Xenforo } from './sites/xenforo.js';
 import {
   cache as cachePath,
@@ -23,6 +24,7 @@ const sites = Object.freeze([
   FanFiction,
   RoyalRoad,
   WanderingInn,
+  WeTried,
   Xenforo,
 ]);
 

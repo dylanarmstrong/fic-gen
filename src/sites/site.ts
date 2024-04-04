@@ -1,3 +1,4 @@
+import { accessSync, constants } from 'node:fs';
 import defaults from 'defaults';
 import type { AnyNode, Cheerio, CheerioAPI } from 'cheerio';
 
@@ -228,27 +229,36 @@ abstract class Site implements ISite {
 
   async transformImages($content: Cheerio<AnyNode>) {
     const images = $content.find('img').toArray();
-    let filepath = '';
     for (let i = 0, len = images.length; i < len; i += 1) {
       const img = images[i];
       const { src } = img.attribs;
+      let filepath = '';
       if (src) {
         try {
           const url = new URL(src);
           const filename = await getPathForEpub(getCachePath(url));
           if (filename) {
-            img.attribs['src'] = `../resources/${filename}`;
             img.attribs['alt'] = img.attribs['alt'] || 'image';
+            img.attribs['src'] = `../resources/${filename}`;
             [, filepath] = await curl(url, this.config, this.log);
           }
-        } catch (e) {
+        } catch {
           // Pass
         }
       }
+
       if (filepath) {
-        this.images.push(filepath);
+        try {
+          accessSync(filepath, constants.R_OK);
+          this.images.push(filepath);
+        } catch {
+          // Pass
+        }
+      } else {
+        img.attribs['src'] = '';
       }
     }
+    $content.remove('img[src=""]');
     return $content;
   }
 }
