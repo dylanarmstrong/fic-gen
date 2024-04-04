@@ -1,9 +1,9 @@
 import defaults from 'defaults';
-import { access, mkdir } from 'node:fs/promises';
 import { constants } from 'node:fs';
+import { access, mkdir } from 'node:fs/promises';
 
-import type { Config } from './types.js';
 import write from './output/epub.js';
+import { setup } from './setup.js';
 import { ArchiveOfOurOwn } from './sites/archiveofourown.js';
 import { BoxNovel } from './sites/boxnovel.js';
 import { FanFiction } from './sites/fanfiction.js';
@@ -13,10 +13,11 @@ import { WeTried } from './sites/wetried.js';
 import { Xenforo } from './sites/xenforo.js';
 import {
   cache as cachePath,
-  curl as curlPath,
   curlHome as curlHomePath,
+  curl as curlPath,
 } from './utils/paths.js';
-import { setup } from './setup.js';
+
+import type { Config } from './types.js';
 
 const sites = Object.freeze([
   ArchiveOfOurOwn,
@@ -38,9 +39,9 @@ const defaultConfig = {
   url: '',
 };
 
-const hasCode = (e: unknown): e is { code: string } =>
-  Object.hasOwnProperty.call(e, 'code') &&
-  typeof (e as { code: unknown }).code === 'string';
+const hasCode = (error: unknown): error is { code: string } =>
+  Object.hasOwnProperty.call(error, 'code') &&
+  typeof (error as { code: unknown }).code === 'string';
 
 class App {
   config: Required<Config>;
@@ -52,10 +53,10 @@ class App {
     this.initialize().then(() => this.writeFic());
   }
 
-  log(level: 'debug' | 'error' | 'info' | 'warn', ...msg: unknown[]) {
+  log(level: 'debug' | 'error' | 'info' | 'warn', ...message: unknown[]) {
     if (level !== 'debug' || (level === 'debug' && this.config.debugMode)) {
       // eslint-disable-next-line no-console
-      console[level](...msg);
+      console[level](...message);
     }
   }
 
@@ -83,9 +84,9 @@ class App {
     if (initialize) {
       try {
         await mkdir(curlHomePath);
-      } catch (e) {
+      } catch (error) {
         // If directory already exists, that's fine
-        if ((hasCode(e) && e.code !== 'EEXIST') || !hasCode(e)) {
+        if ((hasCode(error) && error.code !== 'EEXIST') || !hasCode(error)) {
           throw new Error(
             `Unable to create curl-impersonate directory at ${curlHomePath}`,
           );

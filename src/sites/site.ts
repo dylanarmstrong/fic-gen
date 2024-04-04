@@ -1,20 +1,21 @@
-import { accessSync, constants } from 'node:fs';
 import defaults from 'defaults';
-import type { AnyNode, Cheerio, CheerioAPI } from 'cheerio';
+import { accessSync, constants } from 'node:fs';
 
-import loadHtml from '../utils/loadHtml.js';
-import type { Config, Log } from '../types.js';
 import { curl, getCachePath } from '../network.js';
-import { getPathForEpub } from '../utils/getPathForEpub.js';
+import { getPathForEpub } from '../utils/get-path-for-epub.js';
+import loadHtml from '../utils/load-html.js';
+
+import type { Config, Log } from '../types.js';
+import type { AnyNode, Cheerio, CheerioAPI } from 'cheerio';
 
 type Author = {
   text: string;
-  url: string | null;
+  url: string | undefined;
 };
 
 type Chapter = {
   chapter: number;
-  text: string | null;
+  text: string | undefined;
   title: string;
   url: string;
   words: number;
@@ -28,7 +29,7 @@ type GetChapterOptions = Partial<{
 type Fic = {
   author: Author;
   chapters: Chapter[];
-  cover: URL | null;
+  cover: URL | undefined;
   description: string;
   id: string;
   images: string[];
@@ -62,13 +63,13 @@ interface ISite {
   getChapter(
     url: URL,
     chapterOptions: GetChapterOptions,
-  ): Promise<string | null>;
+  ): Promise<string | undefined>;
   // TODO: getChapterList, refactor getFic to use it
   getChapterTitle($chapter: CheerioAPI): string;
   getChapterWords(content: string | null): number;
-  getCover($chapter: CheerioAPI): Promise<URL | null>;
+  getCover($chapter: CheerioAPI): Promise<URL | undefined>;
   getDescription($chapter: CheerioAPI): string;
-  getFic(): Promise<Fic | null>;
+  getFic(): Promise<Fic | undefined>;
   getIndex(url: URL): ReturnType<ISite['getChapter']>;
   getNumberOfChapters($chapter: CheerioAPI): number;
   getStoryTitle($chapter: CheerioAPI): string;
@@ -115,7 +116,7 @@ abstract class Site implements ISite {
     this.url = new URL(config.url);
   }
 
-  abstract getFic(): Promise<Fic | null>;
+  abstract getFic(): Promise<Fic | undefined>;
 
   getAuthor($chapter: CheerioAPI) {
     const link = $chapter(this.selectors.author);
@@ -125,7 +126,10 @@ abstract class Site implements ISite {
     };
   }
 
-  async getChapter(url: URL, chapterOptions: GetChapterOptions = {}) {
+  async getChapter(
+    url: URL,
+    chapterOptions: GetChapterOptions = {},
+  ): Promise<string | undefined> {
     const { checkCache, checkValidity }: Required<GetChapterOptions> = defaults(
       chapterOptions,
       defaultChapterOptions,
@@ -140,7 +144,7 @@ abstract class Site implements ISite {
       return chapter;
     }
 
-    return null;
+    return undefined;
   }
 
   async getIndex(url: URL) {
@@ -155,17 +159,19 @@ abstract class Site implements ISite {
     return (content || '').split(' ').length;
   }
 
-  async getCover($chapter: CheerioAPI) {
-    const src = $chapter(this.selectors.cover).attr('src');
-    if (!src) {
-      return null;
+  async getCover($chapter: CheerioAPI): Promise<URL | undefined> {
+    const source = $chapter(this.selectors.cover).attr('src');
+    if (!source) {
+      return undefined;
     }
 
     try {
-      return new URL(src);
-    } catch (e) {
-      return null;
+      return new URL(source);
+    } catch {
+      // Pass
     }
+
+    return undefined;
   }
 
   getDescription($chapter: CheerioAPI) {
@@ -193,7 +199,7 @@ abstract class Site implements ISite {
   }
 
   isValidSite() {
-    if (this.url.host.match(this.matcher)) {
+    if (this.matcher.test(this.url.host)) {
       return true;
     }
     return false;
@@ -212,7 +218,7 @@ abstract class Site implements ISite {
     const text = $content.html();
     return {
       chapter: chapterNumber,
-      text,
+      text: text === null ? undefined : text,
       title: this.getChapterTitle($chapter) || `Chapter ${chapterNumber}`,
       url: url.href,
       words: this.getChapterWords(text),
@@ -229,8 +235,8 @@ abstract class Site implements ISite {
 
   async transformImages($content: Cheerio<AnyNode>) {
     const images = $content.find('img').toArray();
-    for (let i = 0, len = images.length; i < len; i += 1) {
-      const img = images[i];
+    for (let index = 0, { length } = images; index < length; index += 1) {
+      const img = images[index];
       const { src } = img.attribs;
       let filepath = '';
       if (src) {

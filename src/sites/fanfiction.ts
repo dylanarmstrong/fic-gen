@@ -1,7 +1,7 @@
-import type { CheerioAPI } from 'cheerio';
+import { Fic, Site } from './site.js';
+import loadHtml from '../utils/load-html.js';
 
-import loadHtml from '../utils/loadHtml.js';
-import { Site } from './site.js';
+import type { CheerioAPI } from 'cheerio';
 
 class FanFiction extends Site {
   override matcher = /^www.fanfiction.net/;
@@ -16,59 +16,69 @@ class FanFiction extends Site {
     storyTitle: 'b.xcontrast_txt',
   };
 
-  async getFic() {
+  async getFic(): Promise<Fic | undefined> {
     let chapter = await this.getIndex(this.url);
-    if (chapter === null) {
-      this.log('error', `Chapter: ${this.url.href} is null`);
-      return null;
-    }
+    if (chapter) {
+      let $chapter = loadHtml(chapter);
+      const chapters = [await this.parseChapter($chapter, 1, this.url)];
+      const byline = $chapter('#profile_top .xgray.xcontrast_txt')
+        .text()
+        .trim();
+      const numberOfChapters = Number.parseInt(
+        byline.replace(/.*Chapters: (\d*) .*$/, '$1'),
+      );
 
-    let $chapter = loadHtml(chapter);
-    const chapters = [await this.parseChapter($chapter, 1, this.url)];
-    const byline = $chapter('#profile_top .xgray.xcontrast_txt').text().trim();
-    const numberOfChapters = Number.parseInt(
-      byline.replace(/.*Chapters: ([0-9]*) .*$/, '$1'),
-    );
+      const author = this.getAuthor($chapter);
+      const description = this.getDescription($chapter);
+      const tags = this.getTags($chapter);
+      const title = this.getStoryTitle($chapter);
+      const words = this.getWords($chapter);
+      const cover = await this.getCover($chapter);
 
-    const author = this.getAuthor($chapter);
-    const description = this.getDescription($chapter);
-    const tags = this.getTags($chapter);
-    const title = this.getStoryTitle($chapter);
-    const words = this.getWords($chapter);
-    const cover = await this.getCover($chapter);
-
-    if (!Number.isNaN(numberOfChapters)) {
-      for (let i = 2, len = numberOfChapters + 1; i < len; i++) {
-        const spl = this.url.href.split('/');
-        spl[spl.length - 2] = String(i);
-        const nextChapter = spl.join('/');
-        const next = this.url;
-        next.href = nextChapter;
-        chapter = await this.getChapter(next);
-        if (chapter !== null) {
-          $chapter = loadHtml(chapter);
-          const parsedChapter = await this.parseChapter($chapter, i, next);
-          chapters.push(parsedChapter);
-        } else {
-          this.log('error', `Chapter: ${next.href} is null`);
+      if (!Number.isNaN(numberOfChapters)) {
+        for (
+          let index = 2, length = numberOfChapters + 1;
+          index < length;
+          index++
+        ) {
+          const spl = this.url.href.split('/');
+          spl[spl.length - 2] = String(index);
+          const nextChapter = spl.join('/');
+          const next = this.url;
+          next.href = nextChapter;
+          chapter = await this.getChapter(next);
+          if (chapter) {
+            $chapter = loadHtml(chapter);
+            const parsedChapter = await this.parseChapter(
+              $chapter,
+              index,
+              next,
+            );
+            chapters.push(parsedChapter);
+          } else {
+            this.log('error', `Chapter: ${next.href} is null`);
+          }
         }
       }
+
+      return {
+        author,
+        chapters,
+        cover,
+        description,
+        id: this.url.pathname.split('/')[2],
+        images: this.images,
+        published: '',
+        publisher: this.publisher,
+        tags,
+        title,
+        updated: '',
+        words,
+      };
     }
 
-    return {
-      author,
-      chapters,
-      cover,
-      description,
-      id: this.url.pathname.split('/')[2],
-      images: this.images,
-      published: '',
-      publisher: this.publisher,
-      tags,
-      title,
-      updated: '',
-      words,
-    };
+    this.log('error', `Chapter: ${this.url.href} is null`);
+    return undefined;
   }
 
   override getAuthor($chapter: CheerioAPI) {
@@ -79,17 +89,18 @@ class FanFiction extends Site {
     };
   }
 
-  override async getCover($chapter: CheerioAPI) {
-    const src = $chapter(this.selectors.cover).attr('src');
-    if (!src) {
-      return null;
+  override async getCover($chapter: CheerioAPI): Promise<URL | undefined> {
+    const source = $chapter(this.selectors.cover).attr('src');
+    if (!source) {
+      return undefined;
     }
 
     try {
-      return new URL(`https://www.fanfiction.net${src}/cover.jpg`);
-    } catch (e) {
-      return null;
+      return new URL(`https://www.fanfiction.net${source}/cover.jpg`);
+    } catch {
+      // Pass
     }
+    return undefined;
   }
 }
 

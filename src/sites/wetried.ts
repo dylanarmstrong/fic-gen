@@ -1,6 +1,8 @@
-import { Chapter, Site } from './site.js';
+import { Chapter, Fic, Site } from './site.js';
 import { curl } from '../network.js';
-import loadHtml from '../utils/loadHtml.js';
+import loadHtml from '../utils/load-html.js';
+
+import type { CheerioAPI } from 'cheerio';
 
 type DataChapter = {
   chapter_name: string;
@@ -54,7 +56,7 @@ class WeTried extends Site {
     storyTitle: 'h1',
   };
 
-  async getFic() {
+  async getFic(): Promise<Fic | undefined> {
     const seriesSlug = this.url.pathname.split('/').at(-1);
     const chapterUrl = new URL(
       'https://api.wetriedtls.com/query?adult=true&query_string=',
@@ -66,7 +68,7 @@ class WeTried extends Site {
 
     if (chaptersXhr === null) {
       this.log('error', `Cannot get chapters list from ${chapterUrl.href}`);
-      return null;
+      return undefined;
     }
 
     const { data } = JSON.parse(chaptersXhr);
@@ -75,7 +77,7 @@ class WeTried extends Site {
       const story = data.find((row) => row.series_slug === seriesSlug);
       if (!story) {
         this.log('error', `Cannot find series slug from ${chapterUrl.href}`);
-        return null;
+        return undefined;
       }
 
       const chapters: Chapter[] = [];
@@ -84,10 +86,7 @@ class WeTried extends Site {
           `${this.url.href}/${story.chapters[index].chapter_slug}`,
         );
         const chapter = await this.getChapter(next);
-        if (chapter === null) {
-          this.log('error', `Chapter: ${next.href} is null`);
-          process.exit(1);
-        } else {
+        if (chapter) {
           const $chapter = loadHtml(chapter);
           const parsedChapter = await this.parseChapter(
             $chapter,
@@ -96,13 +95,15 @@ class WeTried extends Site {
           );
           parsedChapter.title = story.chapters[index].chapter_name;
           chapters.push(parsedChapter);
+        } else {
+          this.log('error', `Chapter: ${next.href} is null`);
         }
       }
 
       const { author, description, thumbnail: cover, title } = story;
 
       return {
-        author: { text: author, url: null },
+        author: { text: author, url: undefined },
         chapters,
         cover: new URL(cover),
         description,
@@ -118,7 +119,12 @@ class WeTried extends Site {
     }
 
     this.log('error', `Cannot parse data from ${chapterUrl.href}`);
-    return null;
+    return undefined;
+  }
+
+  override transformChapter($chapter: CheerioAPI) {
+    $chapter('a').remove();
+    return $chapter;
   }
 }
 

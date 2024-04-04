@@ -1,16 +1,17 @@
 import Epub from '@dylanarmstrong/nodepub';
+import { readFile } from 'node:fs/promises';
+import path from 'node:path';
 import sanitizeHtml from 'sanitize-html';
 import sharp from 'sharp';
-import type { Resource, Section } from '@dylanarmstrong/nodepub';
-import { extname, join } from 'node:path';
-import { readFile } from 'node:fs/promises';
 
-import normalizeHtml from '../utils/normalizeHtml.js';
+import { curl } from '../network.js';
+import { getPathForEpub } from '../utils/get-path-for-epub.js';
+import normalizeHtml from '../utils/normalize-html.js';
+import { validGif, validJpg, validPng } from '../utils/small.js';
+
 import type { Fic } from '../sites/site.js';
 import type { Config, Log } from '../types.js';
-import { curl } from '../network.js';
-import { validGif, validJpg, validPng } from '../utils/small.js';
-import { getPathForEpub } from '../utils/getPathForEpub.js';
+import type { Resource, Section } from '@dylanarmstrong/nodepub';
 
 const write = async (fic: Fic, config: Config, log: Log) => {
   const { outputPath } = config;
@@ -27,7 +28,7 @@ const write = async (fic: Fic, config: Config, log: Log) => {
     coverType = 'image';
     coverData = {
       data: await readFile(filepath),
-      name: `cover.${extname(filepath) || 'jpg'}`,
+      name: `cover.${path.extname(filepath) || 'jpg'}`,
     };
   }
 
@@ -67,7 +68,7 @@ const write = async (fic: Fic, config: Config, log: Log) => {
 
   const { chapters } = fic;
   const sections: Section[] = [];
-  chapters.forEach((chapter) => {
+  for (const chapter of chapters) {
     const { text, title: chapterTitle } = chapter;
     if (text) {
       const content = sanitizeHtml(
@@ -89,7 +90,7 @@ const write = async (fic: Fic, config: Config, log: Log) => {
               'loading',
             ],
           },
-          allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img']),
+          allowedTags: [...sanitizeHtml.defaults.allowedTags, 'img'],
           exclusiveFilter: (frame) => {
             const { tag, attribs } = frame;
             if (tag === 'img') {
@@ -105,7 +106,7 @@ const write = async (fic: Fic, config: Config, log: Log) => {
         title: chapterTitle,
       });
     }
-  });
+  }
 
   const cleanTitle = sanitizeHtml(title);
   if (coverType === 'text') {
@@ -136,14 +137,16 @@ const write = async (fic: Fic, config: Config, log: Log) => {
             .toBuffer(),
         )
         .catch(() => {
-          switch (extname(image)) {
-            case '.gif':
+          switch (path.extname(image)) {
+            case '.gif': {
               return Buffer.from(validGif);
-            case '.png':
+            }
+            case '.png': {
               return Buffer.from(validPng);
-            case '.jpg':
-            default:
+            }
+            default: {
               return Buffer.from(validJpg);
+            }
           }
         });
 
@@ -164,15 +167,17 @@ const write = async (fic: Fic, config: Config, log: Log) => {
 
   const outputTitle = title
     // Possessive 's to s
-    .replace(/'s/g, 's')
+    .replaceAll("'s", 's')
     // Non-friendly characters get replaced with spaces
-    .replace(/[^a-zA-Z0-9!()[\]. ]/g, ' ')
+    .replaceAll(/[^\d !().A-Z[\]a-z]/g, ' ')
+    // Replace Oliver s to Olivers
+    .replaceAll(' s ', 's ')
     // Replace multiple spaces
-    .replace(/\s{2,}/g, ' ');
+    .replaceAll(/\s{2,}/g, ' ');
 
   log(
     'info',
-    `Writing EPUB for '${title}' to '${join(outputPath, outputTitle)}.epub'`,
+    `Writing EPUB for '${title}' to '${path.join(outputPath, outputTitle)}.epub'`,
   );
 
   await epub.write(outputPath, outputTitle);

@@ -1,39 +1,40 @@
 import defaults from 'defaults';
 import md5 from 'md5';
 import mime from 'mime-types';
-import { access, readFile, writeFile } from 'node:fs/promises';
-import { constants } from 'node:fs';
 import { exec as execSync } from 'node:child_process';
-import { extname, join } from 'node:path';
+import { constants } from 'node:fs';
+import { access, readFile, writeFile } from 'node:fs/promises';
+import path from 'node:path';
 import { promisify } from 'node:util';
 
-import type { Config, Log } from './types.js';
 import { cache as cachePath, curl as curlPath } from './utils/paths.js';
+
+import type { Config, Log } from './types.js';
 
 const exec = promisify(execSync);
 
 // TODO: Should cache be split into a story / chapter
 const getCachePath = (url: URL) => {
   const { href, pathname, protocol } = url;
-  let ext = extname(pathname);
+  let extension = path.extname(pathname);
   if (protocol === 'data:') {
     const split = pathname.split(';');
     if (split.length > 0) {
-      const newExt = mime.extension(split[0]);
-      if (newExt) {
-        ext = `.${newExt}`;
+      const newExtension = mime.extension(split[0]);
+      if (newExtension) {
+        extension = `.${newExtension}`;
       }
     }
   }
-  const filename = `${md5(href)}${ext}`;
-  return join(cachePath, filename);
+  const filename = `${md5(href)}${extension}`;
+  return path.join(cachePath, filename);
 };
 
 const getCache = async (file: string) => {
   try {
     await access(file, constants.R_OK);
     return String(await readFile(file));
-  } catch (e) {
+  } catch {
     // Skip
   }
   return '';

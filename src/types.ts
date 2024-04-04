@@ -10,7 +10,7 @@ type Config = {
 
 type Log = (
   level: 'debug' | 'error' | 'info' | 'warn',
-  ...msg: unknown[]
+  ...message: unknown[]
 ) => void;
 
 export type { Config, Log };

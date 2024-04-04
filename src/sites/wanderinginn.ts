@@ -1,10 +1,10 @@
 // Notice: this works, but I've noticed a couple of chapters that result in timeouts
 // So my current solution is just to go to wayback machine and manually place them
 // in the cache folder
-import type { CheerioAPI } from 'cheerio';
+import { Chapter, Fic, Site } from './site.js';
+import loadHtml from '../utils/load-html.js';
 
-import loadHtml from '../utils/loadHtml.js';
-import { Chapter, Site } from './site.js';
+import type { CheerioAPI } from 'cheerio';
 
 class WanderingInn extends Site {
   override matcher = /^wanderinginn.com/;
@@ -19,57 +19,61 @@ class WanderingInn extends Site {
     storyTitle: '.no-element',
   };
 
-  async getFic() {
+  async getFic(): Promise<Fic | undefined> {
     let chapter = await this.getIndex(
       new URL('https://wanderinginn.com/table-of-contents/'),
     );
-    if (chapter === null) {
-      this.log('error', `Chapter: ${this.url.href} is null`);
-      return null;
-    }
+    if (chapter) {
+      let $chapter = loadHtml(chapter);
 
-    let $chapter = loadHtml(chapter);
+      const author = this.getAuthor();
+      const description = this.getDescription();
+      const tags = this.getTags($chapter);
+      const title = this.getStoryTitle();
+      const words = this.getWords($chapter);
+      const cover = await this.getCover();
 
-    const author = this.getAuthor();
-    const description = this.getDescription();
-    const tags = this.getTags($chapter);
-    const title = this.getStoryTitle();
-    const words = this.getWords($chapter);
-    const cover = await this.getCover();
+      const els = $chapter('.chapter-entry a').toArray();
+      const chapters: Chapter[] = [];
+      for (let index = 0, { length } = els; index < length; index += 1) {
+        const next = new URL(els[index].attribs['href']);
+        chapter = await this.getChapter(next);
+        if (chapter === null) {
+          // Try one more time to get without cache
+          chapter = await this.getChapter(next, { checkCache: false });
+        }
 
-    const els = $chapter('.chapter-entry a').toArray();
-    const chapters: Chapter[] = [];
-    for (let i = 0, len = els.length; i < len; i += 1) {
-      const next = new URL(els[i].attribs['href']);
-      chapter = await this.getChapter(next);
-      if (chapter === null) {
-        // Try one more time to get without cache
-        chapter = await this.getChapter(next, { checkCache: false });
+        if (chapter) {
+          $chapter = loadHtml(chapter);
+          const parsedChapter = await this.parseChapter(
+            $chapter,
+            index + 1,
+            next,
+          );
+          chapters.push(parsedChapter);
+        } else {
+          this.log('error', `Chapter: ${next.href} is null`);
+        }
       }
 
-      if (chapter === null) {
-        this.log('error', `Chapter: ${next.href} is null`);
-      } else {
-        $chapter = loadHtml(chapter);
-        const parsedChapter = await this.parseChapter($chapter, i + 1, next);
-        chapters.push(parsedChapter);
-      }
+      return {
+        author,
+        chapters,
+        cover,
+        description,
+        id: 'the-wandering-inn',
+        images: this.images,
+        published: '',
+        publisher: this.publisher,
+        tags,
+        title,
+        updated: '',
+        words,
+      };
     }
 
-    return {
-      author,
-      chapters,
-      cover,
-      description,
-      id: 'the-wandering-inn',
-      images: this.images,
-      published: '',
-      publisher: this.publisher,
-      tags,
-      title,
-      updated: '',
-      words,
-    };
+    this.log('error', `Chapter: ${this.url.href} is null`);
+    return undefined;
   }
 
   override getAuthor() {
@@ -110,28 +114,28 @@ She’s an [Innkeeper].`;
   }
 
   override transformChapter($chapter: CheerioAPI): CheerioAPI {
-    $chapter('a img').each((_, el) => {
-      delete el.attribs['srcset'];
-      if (el.parentNode) {
-        $chapter(el.parentNode).replaceWith(el);
+    $chapter('a img').each((_, element) => {
+      delete element.attribs['srcset'];
+      if (element.parentNode) {
+        $chapter(element.parentNode).replaceWith(element);
       }
     });
 
-    $chapter('dl dt img').each((_, el) => {
-      delete el.attribs['width'];
-      delete el.attribs['height'];
-      delete el.attribs['loading'];
-      if (el.parentNode?.parentNode) {
-        $chapter(el.parentNode.parentNode).replaceWith(el);
+    $chapter('dl dt img').each((_, element) => {
+      delete element.attribs['width'];
+      delete element.attribs['height'];
+      delete element.attribs['loading'];
+      if (element.parentNode?.parentNode) {
+        $chapter(element.parentNode.parentNode).replaceWith(element);
       }
     });
 
-    $chapter('.entry-content a').each((_, el) => {
-      const text = $chapter(el).text().trim();
+    $chapter('.entry-content a').each((_, element) => {
+      const text = $chapter(element).text().trim();
       if (text === 'Previous Chapter' || text === 'Next Chapter') {
-        $chapter(el).remove();
+        $chapter(element).remove();
       } else {
-        $chapter(el).replaceWith(text);
+        $chapter(element).replaceWith(text);
       }
     });
 

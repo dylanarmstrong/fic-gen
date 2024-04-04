@@ -1,8 +1,9 @@
-import type { AnyNode, Cheerio, CheerioAPI, Element } from 'cheerio';
 import { ElementType } from 'htmlparser2';
 
-import loadHtml from '../utils/loadHtml.js';
-import { Chapter, Site } from './site.js';
+import { Chapter, Fic, Site } from './site.js';
+import loadHtml from '../utils/load-html.js';
+
+import type { AnyNode, Cheerio, CheerioAPI, Element } from 'cheerio';
 
 const hasData = (o: unknown): o is { data: string } =>
   Object.hasOwnProperty.call(o, 'data') &&
@@ -32,66 +33,70 @@ class Xenforo extends Site {
     storyTitle: 'h1.p-title-value',
   };
 
-  async getFic() {
+  async getFic(): Promise<Fic | undefined> {
     let chapter = await this.getIndex(getThreadmarkUrl(this.url));
-    if (chapter === null) {
-      this.log('error', `Chapter: ${this.url.href} is null`);
-      return null;
-    }
+    if (chapter) {
+      let $chapter = loadHtml(chapter);
+      const chapters: Chapter[] = [];
+      $chapter('.block-body--threadmarkBody .structItem--threadmark li a').each(
+        (index, element) => {
+          const { href } = element.attribs;
+          const [child] = element.children;
+          chapters.push({
+            chapter: index,
+            text: '',
+            title: hasData(child) ? child.data : `Chapter ${index + 1}`,
+            url: new URL(`${this.url.origin}${href}`).href,
+            words: 0,
+          });
+        },
+      );
 
-    let $chapter = loadHtml(chapter);
-    const chapters: Chapter[] = [];
-    $chapter('.block-body--threadmarkBody .structItem--threadmark li a').each(
-      (i, element) => {
-        const { href } = element.attribs;
-        const [child] = element.children;
-        chapters.push({
-          chapter: i,
-          text: '',
-          title: hasData(child) ? child.data : `Chapter ${i + 1}`,
-          url: new URL(`${this.url.origin}${href}`).href,
-          words: 0,
-        });
-      },
-    );
-
-    if (chapters.length === 0) {
-      return null;
-    }
-
-    const author = this.getAuthor($chapter);
-    const description = this.getDescription($chapter);
-    const tags = this.getTags($chapter);
-    const title = this.getStoryTitle($chapter);
-    const words = this.getWords($chapter);
-    const cover = await this.getCover($chapter);
-
-    for (let i = 0, len = chapters.length; i < len; i++) {
-      const next = new URL(chapters[i].url);
-      chapter = await this.getChapter(new URL(next.href.replace('%23', '#')));
-      if (chapter === null) {
-        this.log('error', `Chapter: ${next.href} is null`);
-      } else {
-        $chapter = loadHtml(chapter);
-        const parsedChapter = await this.parseChapter($chapter, i + 1, next);
-        chapters.splice(i, 1, parsedChapter);
+      if (chapters.length === 0) {
+        return undefined;
       }
+
+      const author = this.getAuthor($chapter);
+      const description = this.getDescription($chapter);
+      const tags = this.getTags($chapter);
+      const title = this.getStoryTitle($chapter);
+      const words = this.getWords($chapter);
+      const cover = await this.getCover($chapter);
+
+      for (let index = 0, { length } = chapters; index < length; index++) {
+        const next = new URL(chapters[index].url);
+        chapter = await this.getChapter(new URL(next.href.replace('%23', '#')));
+        if (chapter) {
+          $chapter = loadHtml(chapter);
+          const parsedChapter = await this.parseChapter(
+            $chapter,
+            index + 1,
+            next,
+          );
+          chapters.splice(index, 1, parsedChapter);
+        } else {
+          this.log('error', `Chapter: ${next.href} is null`);
+        }
+      }
+
+      return {
+        author,
+        chapters,
+        cover,
+        description,
+        id: this.url.pathname.split('/')[2],
+        images: this.images,
+        published: '',
+        publisher: this.publisher,
+        tags,
+        title,
+        updated: '',
+        words,
+      };
     }
 
-    return {
-      author,
-      chapters,
-      cover,
-      description,
-      id: this.url.pathname.split('/')[2],
-      images: this.images,
-      published: '',
-      publisher: this.publisher,
-      tags,
-      title,
-      updated: '',
-      words,
-    };
+    this.log('error', `Chapter: ${this.url.href} is null`);
+    return undefined;
   }
 
   override getAuthor($chapter: CheerioAPI) {
@@ -134,8 +139,9 @@ class Xenforo extends Site {
 
       if (element.type === ElementType.Text) {
         const { data } = element;
+        // eslint-disable-next-line unicorn/no-array-callback-reference
         const $element = $content.find(element as unknown as Element);
-        if (data.match(/^[\n\t\s]*$/) === null) {
+        if (data.match(/^\s*$/) === null) {
           const { parent } = element;
           if (parent?.type === ElementType.Tag) {
             const parentName = parent.name.toLowerCase();
@@ -147,26 +153,26 @@ class Xenforo extends Site {
       }
 
       if (element.type === ElementType.Tag) {
-        element.children.forEach((el) => convertToP(el, depth + 1));
+        for (const element_ of element.children)
+          convertToP(element_, depth + 1);
       }
     };
 
-    $content.each((_, el) => convertToP(el, 0));
+    $content.each((_, element) => convertToP(element, 0));
 
-    const text =
-      $content
-        .html()
-        ?.split('\n')
-        .map((line) => line.trim())
-        .filter((line) => line.length > 0)
-        .join('\n') || null;
+    const text = $content
+      .html()
+      ?.split('\n')
+      .map((line) => line.trim())
+      .filter((line) => line.length > 0)
+      .join('\n');
 
     return {
       chapter: chapterNumber,
       text,
       title,
       url: url.href,
-      words: this.getChapterWords(text),
+      words: this.getChapterWords(text || ''),
     };
   }
 

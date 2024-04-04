@@ -5,6 +5,8 @@
 - Remove default exports on sites
 - Fix Wandering Inn valid chapter check to detect patreon only chapters
 - Add support for `WeTriedLtd`
+- Update dependencies
+- Add `eslint-plugin-unicorn`
 
 ## 2024-02-13 v0.1.0
 - Update `@dylanarmstrong/nodepub` version

@@ -17,6 +17,7 @@ const cli = meow(
     * RoyalRoad
     * SpaceBattles
     * WanderingInn
+    * WeTried
 
   Examples:
     $ fic-gen -c cf_clearance=123 https://www.fanfiction.net/s/12345/1/story-title
@@ -112,14 +113,12 @@ if (!url) {
   cli.showHelp();
 }
 
-(async () => {
-  new App({
-    agent,
-    cache,
-    cookie,
-    debugMode: debug,
-    initialize,
-    outputPath,
-    url,
-  });
-})();
+new App({
+  agent,
+  cache,
+  cookie,
+  debugMode: debug,
+  initialize,
+  outputPath,
+  url,
+});

@@ -1,8 +1,9 @@
 import css from 'css';
-import type { CheerioAPI } from 'cheerio';
 
-import loadHtml from '../utils/loadHtml.js';
-import { Chapter, Site } from './site.js';
+import { Chapter, Fic, Site } from './site.js';
+import loadHtml from '../utils/load-html.js';
+
+import type { CheerioAPI } from 'cheerio';
 
 const hasData = (o: unknown): o is { data: string } =>
   Object.hasOwnProperty.call(o, 'data') &&
@@ -27,74 +28,78 @@ class RoyalRoad extends Site {
     storyTitle: 'h1.font-white',
   };
 
-  async getFic() {
+  async getFic(): Promise<Fic | undefined> {
     let chapter = await this.getIndex(this.url);
-    if (chapter === null) {
-      this.log('error', `Chapter: ${this.url.href} is null`);
-      return null;
-    }
-
-    let $chapter = loadHtml(chapter);
-    let chapters: Chapter[] = [];
-    $chapter('script').each((_, element) => {
-      if (chapters.length === 0 && element.children.length === 1) {
-        const [first] = element.children;
-        if (first && hasData(first)) {
-          const data = first.data
-            .split('\n')
-            .map((s) => s.trim())
-            .filter(Boolean);
-          const chapterIdx = data.findIndex((s) =>
-            s.startsWith('window.chapters = [{'),
-          );
-          if (chapterIdx > -1) {
-            chapters = JSON.parse(
-              data[chapterIdx].replace(/window\.chapters =(.*);/, '$1'),
+    if (chapter) {
+      let $chapter = loadHtml(chapter);
+      let chapters: Chapter[] = [];
+      $chapter('script').each((_, element) => {
+        if (chapters.length === 0 && element.children.length === 1) {
+          const [first] = element.children;
+          if (first && hasData(first)) {
+            const data = first.data
+              .split('\n')
+              .map((s) => s.trim())
+              .filter(Boolean);
+            const chapterIndex = data.findIndex((s) =>
+              s.startsWith('window.chapters = [{'),
             );
+            if (chapterIndex > -1) {
+              chapters = JSON.parse(
+                data[chapterIndex].replace(/window\.chapters =(.*);/, '$1'),
+              );
+            }
           }
         }
-      }
-    });
+      });
 
-    if (chapters.length === 0) {
-      return null;
+      if (chapters.length === 0) {
+        return undefined;
+      }
+
+      const author = this.getAuthor($chapter);
+      const description = this.getDescription($chapter);
+      const tags = this.getTags($chapter);
+      const title = this.getStoryTitle($chapter);
+      const words = this.getWords($chapter);
+      const cover = await this.getCover($chapter);
+
+      for (let index = 0, { length } = chapters; index < length; index++) {
+        const nextChapter = chapters[index].url;
+        const next = this.url;
+        next.pathname = nextChapter;
+        chapter = await this.getChapter(next);
+        if (chapter) {
+          $chapter = loadHtml(chapter);
+          const parsedChapter = await this.parseChapter(
+            $chapter,
+            index + 1,
+            next,
+          );
+          chapters.push(parsedChapter);
+        } else {
+          this.log('error', `Chapter: ${next.href} is null`);
+        }
+      }
+
+      return {
+        author,
+        chapters,
+        cover,
+        description,
+        id: this.url.pathname.split('/')[2],
+        images: this.images,
+        published: '',
+        publisher: this.publisher,
+        tags,
+        title,
+        updated: '',
+        words,
+      };
     }
 
-    const author = this.getAuthor($chapter);
-    const description = this.getDescription($chapter);
-    const tags = this.getTags($chapter);
-    const title = this.getStoryTitle($chapter);
-    const words = this.getWords($chapter);
-    const cover = await this.getCover($chapter);
-
-    for (let i = 0, len = chapters.length; i < len; i++) {
-      const nextChapter = chapters[i].url;
-      const next = this.url;
-      next.pathname = nextChapter;
-      chapter = await this.getChapter(next);
-      if (chapter === null) {
-        this.log('error', `Chapter: ${next.href} is null`);
-      } else {
-        $chapter = loadHtml(chapter);
-        const parsedChapter = await this.parseChapter($chapter, i + 1, next);
-        chapters.push(parsedChapter);
-      }
-    }
-
-    return {
-      author,
-      chapters,
-      cover,
-      description,
-      id: this.url.pathname.split('/')[2],
-      images: this.images,
-      published: '',
-      publisher: this.publisher,
-      tags,
-      title,
-      updated: '',
-      words,
-    };
+    this.log('error', `Chapter: ${this.url.href} is null`);
+    return undefined;
   }
 
   override getAuthor($chapter: CheerioAPI) {
@@ -108,30 +113,34 @@ class RoyalRoad extends Site {
   override transformChapter($chapter: CheerioAPI) {
     $chapter('style').each((_, style) => {
       const [child] = style.children;
+      /* eslint-disable max-depth */
       if (hasData(child)) {
         const rules = css.parse(child.data).stylesheet?.rules;
         if (rules) {
-          rules.forEach((rule) => {
+          for (const rule of rules) {
             let hasDisplayNone = false;
             if (isRule(rule)) {
               const { declarations, selectors } = rule;
-              declarations?.forEach((declaration) => {
-                if (isDeclaration(declaration)) {
-                  const { property, value } = declaration;
-                  if (property === 'display' && value === 'none') {
-                    hasDisplayNone = true;
+              if (declarations) {
+                for (const declaration of declarations) {
+                  if (isDeclaration(declaration)) {
+                    const { property, value } = declaration;
+                    if (property === 'display' && value === 'none') {
+                      hasDisplayNone = true;
+                    }
                   }
                 }
-              });
+              }
               if (hasDisplayNone && selectors) {
-                selectors.forEach((selector) => {
+                for (const selector of selectors) {
                   $chapter(selector).remove();
-                });
+                }
               }
             }
-          });
+          }
         }
       }
+      /* eslint-enable max-depth */
     });
     return $chapter;
   }
@@ -149,7 +158,7 @@ class RoyalRoad extends Site {
     const text = $content.html();
     return {
       chapter: chapterNumber,
-      text,
+      text: text === null ? undefined : text,
       title: this.getChapterTitle($chapter) || `Chapter ${chapterNumber}`,
       url: url.href,
       words: this.getChapterWords(text),

@@ -1,6 +1,7 @@
-import type { CheerioAPI } from 'cheerio';
 import { load as cheerioLoad } from 'cheerio';
 import { parseDocument } from 'htmlparser2';
+
+import type { CheerioAPI } from 'cheerio';
 
 const options = {
   decodeEntities: true,
@@ -13,8 +14,8 @@ const loadHtml = (html: string): CheerioAPI =>
     parseDocument(
       html
         // Remove those non-space spaces before anything else has to deal with the HTML
-        .replace(new RegExp('&#8203;', 'g'), '')
-        .replace(/[\u220b-\u220f\ufeff]/g, ''),
+        .replaceAll(new RegExp('&#8203;', 'g'), '')
+        .replaceAll(/[\u220B-\u220F\uFEFF]/g, ''),
       options,
     ),
   );
