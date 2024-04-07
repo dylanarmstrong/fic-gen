@@ -2,6 +2,8 @@
 
 ## Unpublished
 
+- Update curl-impersonate to 0.6.1
+
 ## 2024-04-04 v0.2.0
 
 - Use `file-type` to determine file extension when missing
